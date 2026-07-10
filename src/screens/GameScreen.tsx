@@ -1,9 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import GameOverModal from '../components/GameOverModal';
+import TutorialModal from '../components/TutorialModal';
 import { GameEngine, type GameSnapshot } from '../game/engine';
 import { getItemImageUrl, getSceneUrl } from '../game/assets';
 import { render, setupCanvas } from '../game/renderer';
 import { consumeHeart, heartsLeft } from '../lib/hearts';
+import { hasSeenHowto, markHowtoSeen } from '../lib/howto';
+import { LANDSCAPE_QUERY, WIDE_LAYOUT_QUERY, useMediaQuery } from '../lib/useMedia';
 
 const BEST_KEY = 'summer-waruru:best';
 
@@ -22,6 +25,17 @@ export default function GameScreen({ onHome }: Props) {
   const [snap, setSnap] = useState<GameSnapshot | null>(null);
   const [best, setBest] = useState(loadBest);
   const [hearts, setHearts] = useState(heartsLeft);
+  // 최초 플레이어에겐 게임 화면 위에서 튜토리얼을 먼저 — 닫을 때까지 물리(크레인) 정지
+  const [showTutorial, setShowTutorial] = useState(() => !hasSeenHowto());
+  // 게임은 기기 불문 세로 전용 — 가로면 일시정지 + 회전 안내
+  const landscape = useMediaQuery(LANDSCAPE_QUERY);
+  const pausedRef = useRef(false);
+  pausedRef.current = showTutorial || landscape;
+
+  const closeTutorial = useCallback(() => {
+    markHowtoSeen();
+    setShowTutorial(false);
+  }, []);
 
   const startGame = useCallback(() => {
     engineRef.current?.destroy();
@@ -47,7 +61,7 @@ export default function GameScreen({ onHome }: Props) {
     const loop = (now: number) => {
       const engine = engineRef.current;
       if (engine) {
-        engine.update(now - last);
+        if (!pausedRef.current) engine.update(now - last);
         render(ctx, engine, vp);
         setSnap(engine.snapshot());
       }
@@ -70,14 +84,20 @@ export default function GameScreen({ onHome }: Props) {
 
   const handleTap = useCallback(() => {
     const engine = engineRef.current;
-    if (!engine || engine.phase === 'gameover') return;
+    if (!engine || engine.phase === 'gameover' || pausedRef.current) return;
     engine.drop();
   }, []);
 
   const isGameOver = snap?.phase === 'gameover';
 
+  // 넓은 화면에선 스테이지 좌우 여백을 가로판 배경으로 채움 (없으면 기본 단색)
+  const wide = useMediaQuery(WIDE_LAYOUT_QUERY);
+  const wideBgUrl = wide ? getSceneUrl('background-wide') : null;
+
   return (
     <div className="app" onPointerDown={handleTap}>
+      {/* 스테이지 좌우 여백: 블러 처리한 가로판 배경 (이음새·이중 태양 문제 회피) */}
+      {wideBgUrl && <div className="side-fill" style={{ backgroundImage: `url(${wideBgUrl})` }} />}
       <div className="stage">
         <canvas ref={canvasRef} className="game-canvas" />
 
@@ -112,6 +132,17 @@ export default function GameScreen({ onHome }: Props) {
             </div>
           </div>
         </div>
+
+        {showTutorial && !landscape && (
+          <TutorialModal onDone={closeTutorial} onClose={closeTutorial} />
+        )}
+
+        {landscape && (
+          <div className="rotate-overlay rotate-overlay-game">
+            <div className="rotate-emoji">📱</div>
+            <p>게임은 세로 화면에서만 플레이할 수 있어요</p>
+          </div>
+        )}
 
         {isGameOver && snap && (
           <GameOverModal

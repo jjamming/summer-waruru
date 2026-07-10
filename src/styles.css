@@ -13,15 +13,32 @@ body,
 }
 
 .app {
+  position: relative;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
   touch-action: manipulation;
   user-select: none;
   -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
   font-family: -apple-system, 'Apple SD Gothic Neo', sans-serif;
+}
+
+/* 스테이지 좌우 여백 채움 — 블러로 게임 영역과의 이음새를 지운다 */
+.side-fill {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(16px) brightness(0.92);
+  /* 블러 가장자리 번짐 숨김 */
+  transform: scale(1.08);
+}
+
+.stage {
+  z-index: 1;
 }
 
 .stage {
@@ -675,6 +692,40 @@ body,
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+/* ---------- 스마트폰 가로모드 안내 (미지원 정책) ---------- */
+
+.rotate-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #1b4a7a;
+  color: #fff;
+  font-size: 17px;
+  font-weight: 700;
+  font-family: -apple-system, 'Apple SD Gothic Neo', sans-serif;
+}
+
+.rotate-emoji {
+  font-size: 44px;
+  animation: rotate-hint 1.6s ease-in-out infinite;
+}
+
+@keyframes rotate-hint {
+  0%,
+  25% {
+    transform: rotate(0deg);
+  }
+  55%,
+  100% {
+    transform: rotate(90deg);
   }
 }
 

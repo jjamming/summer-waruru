@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import TutorialModal from '../components/TutorialModal';
 import { getSceneUrl } from '../game/assets';
 import { MAX_HEARTS, formatRemaining, heartsLeft, nextRefillAt } from '../lib/hearts';
-import { hasSeenHowto, markHowtoSeen } from '../lib/howto';
+import { markHowtoSeen } from '../lib/howto';
+import { WIDE_LAYOUT_QUERY, useMediaQuery } from '../lib/useMedia';
 
 interface Props {
   onStart: () => void;
@@ -22,28 +23,19 @@ export default function LandingScreen({ onStart }: Props) {
     return () => clearInterval(id);
   }, []);
 
-  // 'entry': 첫 게임 시작 시 자동 노출(완료하면 바로 게임 진입), 'manual': 게임 방법 버튼
-  const [tutorial, setTutorial] = useState<'entry' | 'manual' | null>(null);
+  // 게임 방법 버튼으로 여는 재열람 모달 (최초 자동 노출은 게임 화면에서 처리)
+  const [tutorial, setTutorial] = useState(false);
 
   const hearts = heartsLeft(now);
   const refillAt = nextRefillAt(now);
-  const heroUrl = getSceneUrl('hero');
+  // 넓은 화면(태블릿 가로 등)에선 가로판 히어로 우선, 없으면 세로판 폴백
+  const wide = useMediaQuery(WIDE_LAYOUT_QUERY);
+  const heroUrl = (wide && getSceneUrl('hero-wide')) || getSceneUrl('hero');
   const logoUrl = getSceneUrl('logo');
-
-  const handleStart = () => {
-    if (hasSeenHowto()) onStart();
-    else setTutorial('entry');
-  };
 
   const closeTutorial = () => {
     markHowtoSeen();
-    setTutorial(null);
-  };
-
-  const finishTutorial = () => {
-    const mode = tutorial;
-    closeTutorial();
-    if (mode === 'entry') onStart();
+    setTutorial(false);
   };
 
   return (
@@ -69,16 +61,16 @@ export default function LandingScreen({ onStart }: Props) {
         </div>
 
         <div className="landing-cta">
-          <button className="btn btn-primary btn-xl" disabled={hearts <= 0} onClick={handleStart}>
+          <button className="btn btn-primary btn-xl" disabled={hearts <= 0} onClick={onStart}>
             {hearts > 0 ? '게임 시작' : '하트가 다 떨어졌어요'}
           </button>
-          <button className="btn btn-ghost" onClick={() => setTutorial('manual')}>
+          <button className="btn btn-ghost" onClick={() => setTutorial(true)}>
             게임 방법
           </button>
         </div>
       </div>
 
-      {tutorial && <TutorialModal onDone={finishTutorial} onClose={closeTutorial} />}
+      {tutorial && <TutorialModal onDone={closeTutorial} onClose={closeTutorial} />}
     </div>
   );
 }

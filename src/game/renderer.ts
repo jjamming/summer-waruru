@@ -88,13 +88,36 @@ function drawItemSprite(
   ctx.restore();
 }
 
+/** 이미지 위/아래 가장자리 평균색 — 백스톱이 이미지와 티 안 나게 이어지도록 샘플링 */
+const edgeColorCache = new Map<string, { top: string; bottom: string }>();
+
+function edgeColors(img: HTMLImageElement): { top: string; bottom: string } {
+  const cached = edgeColorCache.get(img.src);
+  if (cached) return cached;
+  const c = document.createElement('canvas');
+  c.width = 1;
+  c.height = 2;
+  const cc = c.getContext('2d')!;
+  const strip = Math.max(1, Math.round(img.naturalHeight * 0.02));
+  cc.drawImage(img, 0, 0, img.naturalWidth, strip, 0, 0, 1, 1);
+  cc.drawImage(img, 0, img.naturalHeight - strip, img.naturalWidth, strip, 0, 1, 1, 1);
+  const d = cc.getImageData(0, 0, 1, 2).data;
+  const colors = {
+    top: `rgb(${d[0]},${d[1]},${d[2]})`,
+    bottom: `rgb(${d[4]},${d[5]},${d[6]})`,
+  };
+  edgeColorCache.set(img.src, colors);
+  return colors;
+}
+
 function drawBackground(ctx: CanvasRenderingContext2D, vp: Viewport) {
   const bg = getSceneImage('background');
   if (bg) {
-    // 백스톱: 이미지 블리드가 화면보다 짧아도 위(하늘)/아래(바다) 색으로 이어진다
-    ctx.fillStyle = '#8ed0f5';
+    // 백스톱: 이미지 블리드가 화면보다 짧아도(초장신 기기) 가장자리 색으로 이어진다
+    const edge = edgeColors(bg);
+    ctx.fillStyle = edge.top;
     ctx.fillRect(0, 0, vp.w, vp.top + C.voidY);
-    ctx.fillStyle = '#1a7fb8';
+    ctx.fillStyle = edge.bottom;
     ctx.fillRect(0, vp.top + C.voidY, vp.w, vp.h - vp.top - C.voidY);
 
     // 이미지의 원본 9:16 프레임(세로 중앙 가정)을 게임 월드(400×720)에 정렬해
@@ -170,16 +193,7 @@ function drawCrane(ctx: CanvasRenderingContext2D, engine: GameEngine) {
   const x = engine.craneX;
 
   // HUD(점수/최고기록) 바로 아래에 배치
-  const wireY = 92;
   const cloudY = 104;
-
-  // 와이어 (구름이 매달려 이동하는 가로줄)
-  ctx.strokeStyle = 'rgba(255,255,255,0.7)';
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.moveTo(0, wireY);
-  ctx.lineTo(C.width, wireY);
-  ctx.stroke();
 
   // 구름 크레인 캐릭터 — 이미지 있으면 이미지, 없으면 이모지 폴백
   const crane = getSceneImage('crane');
