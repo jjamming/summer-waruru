@@ -5,9 +5,13 @@
  */
 
 import Matter from 'matter-js';
+import decomp from 'poly-decomp';
 import rawHitboxes from './hitboxes.json';
 import { GAME_CONFIG as C } from './config';
 import type { ItemDef } from './items';
+
+// 오목(concave) 폴리곤을 볼록 조각으로 분해할 수 있게 등록 — fromVertices가 내부에서 사용
+Matter.Common.setDecomp(decomp);
 
 interface HitboxData {
   /** 이미지 height / width */

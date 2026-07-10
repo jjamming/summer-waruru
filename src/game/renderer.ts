@@ -238,10 +238,14 @@ function drawItems(ctx: CanvasRenderingContext2D, items: readonly DroppedItem[])
     ctx.strokeStyle = 'rgba(255,0,90,0.9)';
     ctx.lineWidth = 1.5;
     for (const item of items) {
-      ctx.beginPath();
-      item.body.vertices.forEach((v, i) => (i === 0 ? ctx.moveTo(v.x, v.y) : ctx.lineTo(v.x, v.y)));
-      ctx.closePath();
-      ctx.stroke();
+      // 오목 폴리곤은 볼록 조각(compound parts)으로 분해됨 — parts[0]은 컨테이너라 제외
+      const parts = item.body.parts.length > 1 ? item.body.parts.slice(1) : item.body.parts;
+      for (const part of parts) {
+        ctx.beginPath();
+        part.vertices.forEach((v, i) => (i === 0 ? ctx.moveTo(v.x, v.y) : ctx.lineTo(v.x, v.y)));
+        ctx.closePath();
+        ctx.stroke();
+      }
     }
   }
 }
