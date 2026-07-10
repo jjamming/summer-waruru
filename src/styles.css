@@ -47,6 +47,8 @@ body,
   width: min(100vw, calc(100dvh * 400 / 720));
   height: 100dvh;
   overflow: hidden;
+  /* HUD 크기를 스테이지 폭 기준으로 조절 (cqw) — 태블릿에서 너무 작아지지 않게 */
+  container-type: inline-size;
 }
 
 .game-canvas {
@@ -60,7 +62,8 @@ body,
   top: 0;
   left: 0;
   right: 0;
-  padding: max(14px, env(safe-area-inset-top)) 14px 0;
+  /* 노치 세이프에어리어 + 토스 게임 내비게이션 바(더보기/X, 우상단 오버레이) 아래로 */
+  padding: calc(max(12px, env(safe-area-inset-top)) + 44px) 14px 0;
   pointer-events: none;
 }
 
@@ -73,9 +76,9 @@ body,
   background: rgba(255, 255, 255, 0.92);
   color: #1b4a7a;
   font-weight: 800;
-  font-size: 14px;
-  padding: 7px 12px;
-  border-radius: 12px;
+  font-size: clamp(13px, 3.6cqw, 21px);
+  padding: 0.5em 0.85em;
+  border-radius: 0.85em;
   box-shadow: 0 2px 6px rgba(0, 40, 80, 0.18);
 }
 
@@ -95,27 +98,27 @@ body,
 }
 
 .next-title {
-  font-size: 10px;
+  font-size: clamp(10px, 2.6cqw, 15px);
   font-weight: 800;
   color: #7b8aa0;
   letter-spacing: 1px;
 }
 
 .next-emoji {
-  font-size: 26px;
+  font-size: clamp(26px, 7cqw, 40px);
   line-height: 1.2;
 }
 
 .next-img {
-  height: 30px;
-  max-width: 44px;
+  height: clamp(30px, 8cqw, 46px);
+  max-width: clamp(44px, 12cqw, 68px);
   object-fit: contain;
   display: block;
   margin: 0 auto;
 }
 
 .next-label {
-  font-size: 9px;
+  font-size: clamp(9px, 2.4cqw, 14px);
   font-weight: 700;
   color: #4a5a72;
   letter-spacing: 0.5px;
@@ -123,9 +126,9 @@ body,
 
 .life-badge {
   background: rgba(255, 255, 255, 0.92);
-  border-radius: 12px;
-  padding: 6px 10px;
-  font-size: 13px;
+  border-radius: 0.85em;
+  padding: 0.45em 0.75em;
+  font-size: clamp(13px, 3.4cqw, 20px);
   font-weight: 800;
   color: #d33;
   box-shadow: 0 2px 6px rgba(0, 40, 80, 0.18);
@@ -135,8 +138,8 @@ body,
 }
 
 .life-badge-img {
-  width: 16px;
-  height: 16px;
+  width: 1.2em;
+  height: 1.2em;
   object-fit: contain;
 }
 

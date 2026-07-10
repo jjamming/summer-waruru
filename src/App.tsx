@@ -18,6 +18,27 @@ export default function App() {
       .catch(() => {});
   }, []);
 
+  useEffect(() => {
+    // 게임 중 뒤로가기(안드로이드/내비 바) → 미니앱 종료 대신 랜딩 복귀.
+    // 랜딩에서는 리스너를 등록하지 않아 기본 동작(미니앱 닫기)이 유지된다.
+    if (screen !== 'game') return;
+    let unsubscribe: (() => void) | undefined;
+    let cancelled = false;
+    import('@apps-in-toss/web-framework')
+      .then((m) => {
+        if (cancelled) return;
+        unsubscribe = m.graniteEvent.addEventListener('backEvent', {
+          onEvent: () => setScreen('landing'),
+          onError: () => {},
+        });
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+      unsubscribe?.();
+    };
+  }, [screen]);
+
   const startGame = useCallback(() => {
     if (!consumeHeart()) return;
     setGameKey((k) => k + 1);

@@ -16,6 +16,10 @@ export default defineConfig({
       build: 'vite build',
     },
   },
+  // 게임용 내비게이션 바 (더보기 + 닫기 X) — 출시 가이드 필수
+  webViewProps: {
+    type: 'game',
+  },
   permissions: [],
   outdir: 'dist',
 });
