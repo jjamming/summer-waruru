@@ -16,6 +16,7 @@ export default function TutorialModal({ onDone, onClose }: Props) {
   const slice = getItemImageUrl('watermelon-slice');
   const patbingsu = getItemImageUrl('patbingsu');
   const tube = getItemImageUrl('tube');
+  const cooler = getItemImageUrl('cooler');
 
   const steps = [
     {
@@ -39,8 +40,11 @@ export default function TutorialModal({ onDone, onClose }: Props) {
       title: '차곡차곡 쌓아봐요',
       desc: '떨어뜨린 아이템은 그 자리에 그대로 쌓여요.',
       demo: (
+        // 엉망으로 쌓인 더미 위, 수박이 수박 위에 그대로 얹히는 장면
         <div className="demo demo-merge">
-          {melon ? <img className="demo-merge-bottom" src={melon} alt="" /> : <span className="demo-merge-bottom demo-fallback">🍉</span>}
+          {cooler ? <img className="demo-pile-cooler" src={cooler} alt="" /> : <span className="demo-pile-cooler demo-fallback">🧊</span>}
+          {tube ? <img className="demo-pile-tube" src={tube} alt="" /> : <span className="demo-pile-tube demo-fallback">🛟</span>}
+          {melon ? <img className="demo-pile-melon" src={melon} alt="" /> : <span className="demo-pile-melon demo-fallback">🍉</span>}
           {melon ? <img className="demo-merge-top" src={melon} alt="" /> : <span className="demo-merge-top demo-fallback">🍉</span>}
           <div className="demo-merge-note">차곡차곡!</div>
           <div className="demo-plank" />

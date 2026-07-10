@@ -575,17 +575,32 @@ body,
   }
 }
 
-/* 2단계: 수박 위에 수박 — 합쳐지지 않고 그대로 쌓인다 (3.2초 루프) */
-.demo-merge-bottom {
-  width: 34px;
-  left: calc(50% - 17px);
+/* 2단계: 엉망 더미 위에 수박이 수박 위로 얹힌다 (3.2초 루프) */
+.demo-pile-cooler {
+  width: 40px;
+  left: calc(50% - 48px);
   bottom: 34px;
+  transform: rotate(-3deg);
+}
+
+.demo-pile-tube {
+  width: 46px;
+  left: calc(50% + 2px);
+  bottom: 34px;
+  transform: rotate(6deg);
+}
+
+.demo-pile-melon {
+  width: 28px;
+  left: calc(50% - 44px);
+  bottom: 63px;
+  transform: rotate(7deg);
 }
 
 .demo-merge-top {
-  width: 34px;
-  left: calc(50% - 17px);
-  bottom: 70px;
+  width: 28px;
+  left: calc(50% - 42px);
+  bottom: 92px;
   animation: demo-merge-drop 3.2s infinite;
 }
 
