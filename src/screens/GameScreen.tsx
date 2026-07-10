@@ -97,7 +97,7 @@ export default function GameScreen({ onHome }: Props) {
       setGameOverVisible(false);
       return;
     }
-    const t = setTimeout(() => setGameOverVisible(true), 1100);
+    const t = setTimeout(() => setGameOverVisible(true), 800);
     return () => clearTimeout(t);
   }, [isGameOver]);
 
