@@ -14,13 +14,13 @@ export default function TutorialModal({ onDone, onClose }: Props) {
   const crane = getSceneUrl('crane');
   const melon = getItemImageUrl('watermelon');
   const slice = getItemImageUrl('watermelon-slice');
-  const peach = getItemImageUrl('peach');
+  const patbingsu = getItemImageUrl('patbingsu');
   const tube = getItemImageUrl('tube');
 
   const steps = [
     {
       title: '아이템을 잡은 구름이 움직여요',
-      desc: '화면을 터치해서 아이템을 떨어뜨려요.',
+      desc: '화면을 터치해서 아이템을 떨어뜨려요. 합쳐지지 않아요!',
       demo: (
         <div className="demo demo-drop">
           {/* 구름·로프·아이템을 한 리그로 묶어 항상 같이 움직인다 */}
@@ -51,7 +51,7 @@ export default function TutorialModal({ onDone, onClose }: Props) {
       demo: (
         <div className="demo demo-stack">
           {slice ? <img className="demo-stack-1" src={slice} alt="" /> : <span className="demo-stack-1 demo-fallback">🍉</span>}
-          {peach ? <img className="demo-stack-2" src={peach} alt="" /> : <span className="demo-stack-2 demo-fallback">🍑</span>}
+          {patbingsu ? <img className="demo-stack-2" src={patbingsu} alt="" /> : <span className="demo-stack-2 demo-fallback">🍧</span>}
           {tube ? <img className="demo-stack-3" src={tube} alt="" /> : <span className="demo-stack-3 demo-fallback">🛟</span>}
           <div className="demo-score">+25 +20 +15</div>
           <div className="demo-plank" />

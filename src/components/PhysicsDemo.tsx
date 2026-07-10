@@ -18,7 +18,7 @@ const CYCLE_MS = 4200;
 /** 살짝 어긋나게 쌓아 매 사이클 같은 모양으로 자연 붕괴를 유도 */
 const STACK: { id: string; offsetX: number }[] = [
   { id: 'watermelon-slice', offsetX: 0 },
-  { id: 'peach', offsetX: 5 },
+  { id: 'strawberry', offsetX: 5 },
   { id: 'patbingsu', offsetX: -7 },
   { id: 'tube', offsetX: 13 },
 ];

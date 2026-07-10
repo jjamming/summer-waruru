@@ -9,8 +9,8 @@ export const GAME_CONFIG = {
 
   /** 판자 개수: 1 또는 2 (노션: config로 조정 가능하게) */
   platformCount: 1 as 1 | 2,
-  /** 판자 폭 — 화면 폭 대비 비율 (노션: 40~50% 권장) */
-  platformWidthRatio: 0.46,
+  /** 판자 폭 — 화면 폭 대비 비율 (UT "너무 좁다" 피드백으로 0.46→0.56) */
+  platformWidthRatio: 0.56,
   /** 판자 2개일 때 각각의 폭 비율 */
   platformWidthRatioDouble: 0.3,
   /** 판자 윗면 y 좌표 */

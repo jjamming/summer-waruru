@@ -19,16 +19,27 @@ export function randomSeed(): number {
   return Math.floor(Math.random() * 0xffffffff);
 }
 
-/** 가중치 기반 아이템 시퀀스 생성기 */
+/** 초반에 보장 등장시킬 안정(평평) 아이템 개수 — "쌓는 게임" 멘탈모델 형성 (UT 피드백) */
+const OPENING_FLAT_COUNT = 3;
+
+function pickWeighted(pool: ItemDef[], roll01: number): ItemDef {
+  const total = pool.reduce((sum, it) => sum + it.weight, 0);
+  let roll = roll01 * total;
+  for (const it of pool) {
+    roll -= it.weight;
+    if (roll <= 0) return it;
+  }
+  return pool[pool.length - 1];
+}
+
+/** 가중치 기반 아이템 시퀀스 생성기 — 첫 N개는 opener(평평·안정) 풀에서만 */
 export function createItemSequence(seed: number): () => ItemDef {
   const rand = mulberry32(seed);
-  const totalWeight = ITEMS.reduce((sum, it) => sum + it.weight, 0);
+  const openers = ITEMS.filter((it) => it.opener);
+  let count = 0;
   return () => {
-    let roll = rand() * totalWeight;
-    for (const it of ITEMS) {
-      roll -= it.weight;
-      if (roll <= 0) return it;
-    }
-    return ITEMS[ITEMS.length - 1];
+    const pool = count < OPENING_FLAT_COUNT && openers.length > 0 ? openers : ITEMS;
+    count += 1;
+    return pickWeighted(pool, rand());
   };
 }

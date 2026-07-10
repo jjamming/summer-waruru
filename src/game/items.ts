@@ -20,6 +20,8 @@ export interface ItemDef {
   restitution: number;
   /** 시드 뽑기 가중치 (높을수록 자주 등장) */
   weight: number;
+  /** 초반 보장 등장 아이템 (평평·안정 — "쌓는 게임" 멘탈모델 형성용, rng.ts 참고) */
+  opener?: boolean;
 }
 
 export const ITEMS: ItemDef[] = [
@@ -36,26 +38,16 @@ export const ITEMS: ItemDef[] = [
   },
   {
     id: 'tube',
-    // 노션: 링 형태지만 물리는 단순 원형, 점수 하향
+    // 누워 있는 튜브 — 위가 평평한 납작 캡슐, 쌓기 좋은 안정재 (UT 피드백으로 원형→납작 전환)
     label: '튜브',
     emoji: '🛟',
-    shape: { kind: 'circle', radius: 23 },
+    shape: { kind: 'capsule', width: 46, height: 16 },
     points: 15,
-    density: 0.0008,
-    friction: 0.65,
-    restitution: 0.1,
+    density: 0.0009,
+    friction: 0.7,
+    restitution: 0.05,
     weight: 12,
-  },
-  {
-    id: 'peach',
-    label: '복숭아',
-    emoji: '🍑',
-    shape: { kind: 'circle', radius: 18 },
-    points: 20,
-    density: 0.0012,
-    friction: 0.55,
-    restitution: 0.06,
-    weight: 14,
+    opener: true,
   },
   {
     id: 'strawberry',
@@ -66,7 +58,32 @@ export const ITEMS: ItemDef[] = [
     density: 0.001,
     friction: 0.6,
     restitution: 0.06,
-    weight: 16,
+    weight: 12,
+  },
+  {
+    id: 'cooler',
+    // 대형 안정 박스 — 탑의 토대용
+    label: '아이스박스',
+    emoji: '🧊',
+    shape: { kind: 'box', width: 44, height: 30 },
+    points: 20,
+    density: 0.0016,
+    friction: 0.75,
+    restitution: 0.02,
+    weight: 10,
+    opener: true,
+  },
+  {
+    id: 'bucket',
+    label: '모래 양동이',
+    emoji: '🪣',
+    shape: { kind: 'box', width: 30, height: 26 },
+    points: 20,
+    density: 0.0012,
+    friction: 0.65,
+    restitution: 0.04,
+    weight: 8,
+    opener: true,
   },
   {
     id: 'patbingsu',
@@ -78,6 +95,7 @@ export const ITEMS: ItemDef[] = [
     friction: 0.7,
     restitution: 0.02,
     weight: 12,
+    opener: true,
   },
   {
     id: 'watermelon-slice',
@@ -90,6 +108,7 @@ export const ITEMS: ItemDef[] = [
     friction: 0.6,
     restitution: 0.04,
     weight: 10,
+    opener: true,
   },
   {
     id: 'icecream',

@@ -46,6 +46,8 @@ export default function LandingScreen({ onStart }: Props) {
         ) : (
           <h1 className="landing-title">여름 와르르</h1>
         )}
+        {/* 수박게임 오해 방지 — 합치기가 아니라 쌓기 (UT 피드백) */}
+        <p className="landing-tagline">합치는 게임이 아니에요! 무너지지 않게 쌓아 올리세요</p>
       </div>
 
       <div className="landing-bottom">
