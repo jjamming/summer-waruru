@@ -20,7 +20,7 @@ export default function TutorialModal({ onDone, onClose }: Props) {
   const steps = [
     {
       title: '아이템을 잡은 구름이 움직여요',
-      desc: '화면을 터치해서 아이템을 떨어뜨려요. 합쳐지지 않아요!',
+      desc: '화면을 터치해서 아이템을 떨어뜨려요.',
       demo: (
         <div className="demo demo-drop">
           {/* 구름·로프·아이템을 한 리그로 묶어 항상 같이 움직인다 */}
@@ -30,6 +30,19 @@ export default function TutorialModal({ onDone, onClose }: Props) {
             {melon ? <img className="demo-hang" src={melon} alt="" /> : <span className="demo-hang demo-fallback">🍉</span>}
           </div>
           <div className="demo-tap" />
+          <div className="demo-plank" />
+          <div className="demo-sea" />
+        </div>
+      ),
+    },
+    {
+      title: '합쳐지지 않아요!',
+      desc: '같은 아이템도 그대로 쌓여요. 차곡차곡 쌓는 게임이에요.',
+      demo: (
+        <div className="demo demo-merge">
+          {melon ? <img className="demo-merge-bottom" src={melon} alt="" /> : <span className="demo-merge-bottom demo-fallback">🍉</span>}
+          {melon ? <img className="demo-merge-top" src={melon} alt="" /> : <span className="demo-merge-top demo-fallback">🍉</span>}
+          <div className="demo-merge-note">합체 ❌ 그대로 쌓임 ⭕</div>
           <div className="demo-plank" />
           <div className="demo-sea" />
         </div>

@@ -587,6 +587,79 @@ body,
   }
 }
 
+/* 2단계: 수박 위에 수박 — 합쳐지지 않고 그대로 쌓인다 (3.2초 루프) */
+.demo-merge-bottom {
+  width: 34px;
+  left: calc(50% - 17px);
+  bottom: 34px;
+}
+
+.demo-merge-top {
+  width: 34px;
+  left: calc(50% - 17px);
+  bottom: 70px;
+  animation: demo-merge-drop 3.2s infinite;
+}
+
+@keyframes demo-merge-drop {
+  0%,
+  12% {
+    transform: translateY(-64px);
+    opacity: 0;
+  }
+  18% {
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.5, 0, 1, 1);
+  }
+  38% {
+    /* 아래 수박 위에 착지 */
+    transform: translateY(0);
+  }
+  43% {
+    /* 살짝 눌리는 스쿼시 — 충돌했지만 합쳐지지 않음 */
+    transform: translateY(2px) scale(1.06, 0.9);
+  }
+  48%,
+  94% {
+    transform: translateY(0) scale(1, 1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+}
+
+.demo-merge-note {
+  position: absolute;
+  top: 14px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 900;
+  color: #e5484d;
+  text-shadow: 0 1px 0 #fff;
+  opacity: 0;
+  animation: demo-merge-note-anim 3.2s ease-out infinite;
+}
+
+@keyframes demo-merge-note-anim {
+  0%,
+  40% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  50%,
+  92% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 /* 2단계: 실제 matter.js 캔버스 (PhysicsDemo) */
 .demo-canvas {
   display: block;
