@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import GameOverModal from '../components/GameOverModal';
-import { GAME_CONFIG as C } from '../game/config';
 import { GameEngine, type GameSnapshot } from '../game/engine';
 import { getItemImageUrl, getSceneUrl } from '../game/assets';
 import { render, setupCanvas } from '../game/renderer';
@@ -41,7 +40,7 @@ export default function GameScreen({ onHome }: Props) {
   useEffect(() => {
     startGame();
     const canvas = canvasRef.current!;
-    const ctx = setupCanvas(canvas);
+    const { ctx, vp } = setupCanvas(canvas);
 
     let raf = 0;
     let last = performance.now();
@@ -49,7 +48,7 @@ export default function GameScreen({ onHome }: Props) {
       const engine = engineRef.current;
       if (engine) {
         engine.update(now - last);
-        render(ctx, engine);
+        render(ctx, engine, vp);
         setSnap(engine.snapshot());
       }
       last = now;
@@ -79,7 +78,7 @@ export default function GameScreen({ onHome }: Props) {
 
   return (
     <div className="app" onPointerDown={handleTap}>
-      <div className="stage" style={{ aspectRatio: `${C.width} / ${C.height}` }}>
+      <div className="stage">
         <canvas ref={canvasRef} className="game-canvas" />
 
         {/* HUD */}
@@ -89,6 +88,15 @@ export default function GameScreen({ onHome }: Props) {
             <div className="badge">최고 기록 {best.toLocaleString()}</div>
           </div>
           <div className="hud-sub">
+            <div className="life-badge">
+              {getSceneUrl('heart-full') ? (
+                <img className="life-badge-img" src={getSceneUrl('heart-full')!} alt="하트" />
+              ) : (
+                '❤️'
+              )}{' '}
+              {hearts}
+            </div>
+            {/* 다음 아이템은 최고 기록 아래(우측) */}
             <div className="next-card">
               <div className="next-title">다음</div>
               {snap && (
@@ -101,14 +109,6 @@ export default function GameScreen({ onHome }: Props) {
                 </div>
               )}
               <div className="next-label">{snap?.next.label}</div>
-            </div>
-            <div className="life-badge">
-              {getSceneUrl('heart-full') ? (
-                <img className="life-badge-img" src={getSceneUrl('heart-full')!} alt="하트" />
-              ) : (
-                '❤️'
-              )}{' '}
-              {hearts}
             </div>
           </div>
         </div>

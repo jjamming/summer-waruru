@@ -129,14 +129,14 @@ export class GameEngine {
     this.holdTimerMs = C.dropCooldownMs;
   }
 
-  /** 크레인 고리 아래 아이템 중심까지의 거리 */
+  /** 크레인 고리 아래 아이템 중심까지의 거리 — 로프 끝에 바로 맞닿게 */
   hangOffset(def: ItemDef): number {
     switch (def.shape.kind) {
       case 'circle':
-        return def.shape.radius + 6;
+        return def.shape.radius + 2;
       case 'box':
       case 'capsule':
-        return def.shape.height / 2 + 6;
+        return def.shape.height / 2 + 2;
     }
   }
 
