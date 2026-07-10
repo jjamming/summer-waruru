@@ -12,7 +12,8 @@ export default defineConfig({
     host: 'localhost',
     port: 5173,
     commands: {
-      dev: 'vite dev',
+      // --host: 실기기(샌드박스 앱)에서 같은 와이파이로 접속할 수 있게 외부 바인딩
+      dev: 'vite dev --host',
       build: 'vite build',
     },
   },
