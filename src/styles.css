@@ -399,6 +399,12 @@ body,
   gap: 8px;
 }
 
+/* 종료 확인 모달 — 화면(랜딩/게임) 위 최상단 */
+.exit-confirm {
+  position: fixed;
+  z-index: 90;
+}
+
 /* 버튼이 아닌 순수 텍스트 링크 */
 .text-link {
   -webkit-appearance: none;
