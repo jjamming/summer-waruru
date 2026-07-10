@@ -25,6 +25,15 @@ export default function App() {
       .then((m) => {
         m.setDeviceOrientation({ type: 'portrait' }).catch(() => {});
         m.setIosSwipeGestureEnabled({ isEnabled: false }).catch(() => {});
+        // env(safe-area-inset-top)이 0인 웹뷰 대비 — 네이티브 인셋을 CSS 변수로 주입
+        try {
+          const insets = m.SafeAreaInsets.get() as unknown as { top?: number };
+          if (insets?.top && insets.top > 0) {
+            document.documentElement.style.setProperty('--toss-sat', `${insets.top}px`);
+          }
+        } catch {
+          // 토스 밖 — env()와 14px 최소값으로 충분
+        }
         // 사용자 식별키 발급·저장 (출시 체크리스트 3번, 리더보드 대비)
         m.getUserKeyForGame()
           .then((key) => {
