@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import GameOverModal from '../components/GameOverModal';
+import RotateOverlay from '../components/RotateOverlay';
 import TutorialModal from '../components/TutorialModal';
 import { GameEngine, type GameSnapshot } from '../game/engine';
 import { getItemImageUrl, getSceneUrl } from '../game/assets';
@@ -149,9 +150,8 @@ export default function GameScreen({ onHome }: Props) {
         )}
 
         {landscape && (
-          <div className="rotate-overlay rotate-overlay-game">
-            <div className="rotate-emoji">📱</div>
-            <p>게임은 세로 화면에서만 플레이할 수 있어요</p>
+          <div className="rotate-overlay-game">
+            <RotateOverlay />
           </div>
         )}
 

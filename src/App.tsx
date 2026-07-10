@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import RotateOverlay from './components/RotateOverlay';
 import GameScreen from './screens/GameScreen';
 import LandingScreen from './screens/LandingScreen';
 import { consumeHeart } from './lib/hearts';
@@ -52,12 +53,7 @@ export default function App() {
       ) : (
         <GameScreen key={gameKey} onHome={() => setScreen('landing')} />
       )}
-      {phoneLandscape && (
-        <div className="rotate-overlay">
-          <div className="rotate-emoji">📱</div>
-          <p>세로 화면으로 돌려주세요</p>
-        </div>
-      )}
+      {phoneLandscape && <RotateOverlay />}
     </>
   );
 }

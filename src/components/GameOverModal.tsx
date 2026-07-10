@@ -90,7 +90,7 @@ export default function GameOverModal({
             <p className="modal-refill">다음 하트까지 {formatRemaining(refillAt - Date.now())}</p>
           )}
           {shareNote && <p className="modal-share-note">{shareNote}</p>}
-          <button className="btn btn-ghost" onClick={onHome}>
+          <button className="text-link" onClick={onHome}>
             처음 화면으로
           </button>
         </div>

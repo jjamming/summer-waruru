@@ -399,6 +399,22 @@ body,
   gap: 8px;
 }
 
+/* 버튼이 아닌 순수 텍스트 링크 */
+.text-link {
+  -webkit-appearance: none;
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 6px 8px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: #8b95a1;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .modal-refill,
 .modal-share-note {
   font-size: 12px;
@@ -824,11 +840,17 @@ body,
   align-items: center;
   justify-content: center;
   gap: 10px;
-  background: #1b4a7a;
+  /* hero 이미지 + 딤 — 컴포넌트에서 inline style로 주입 (이미지 없으면 폴백 딤) */
+  background-color: rgba(6, 24, 44, 0.85);
+  background-size: cover;
+  background-position: center;
   color: #fff;
   font-size: 17px;
   font-weight: 700;
   font-family: -apple-system, 'Apple SD Gothic Neo', sans-serif;
+  text-shadow: 0 1px 3px rgba(0, 20, 40, 0.5);
+  padding: 0 24px;
+  text-align: center;
 }
 
 .rotate-emoji {
