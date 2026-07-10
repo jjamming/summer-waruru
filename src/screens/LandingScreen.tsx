@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import TutorialModal from '../components/TutorialModal';
 import { getSceneUrl } from '../game/assets';
 import { MAX_HEARTS, formatRemaining, heartsLeft, nextRefillAt } from '../lib/hearts';
+import soundOffIcon from '../assets/sound-off.svg';
+import soundOnIcon from '../assets/sound-on.svg';
 import { markHowtoSeen } from '../lib/howto';
 import { isSoundOn, setSoundOn } from '../lib/sound';
 import { WIDE_LAYOUT_QUERY, useMediaQuery } from '../lib/useMedia';
@@ -52,7 +54,7 @@ export default function LandingScreen({ onStart }: Props) {
         onClick={toggleSound}
         aria-label={soundOn ? '사운드 끄기' : '사운드 켜기'}
       >
-        {soundOn ? '🔊' : '🔇'}
+        <img className="sound-toggle-icon" src={soundOn ? soundOnIcon : soundOffIcon} alt="" />
       </button>
 
       <div className="landing-hero">
