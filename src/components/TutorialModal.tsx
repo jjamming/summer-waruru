@@ -36,13 +36,13 @@ export default function TutorialModal({ onDone, onClose }: Props) {
       ),
     },
     {
-      title: '합쳐지지 않아요!',
-      desc: '같은 아이템도 그대로 쌓여요. 차곡차곡 쌓는 게임이에요.',
+      title: '차곡차곡 쌓아봐요',
+      desc: '떨어뜨린 아이템은 그 자리에 그대로 쌓여요.',
       demo: (
         <div className="demo demo-merge">
           {melon ? <img className="demo-merge-bottom" src={melon} alt="" /> : <span className="demo-merge-bottom demo-fallback">🍉</span>}
           {melon ? <img className="demo-merge-top" src={melon} alt="" /> : <span className="demo-merge-top demo-fallback">🍉</span>}
-          <div className="demo-merge-note">합체 ❌ 그대로 쌓임 ⭕</div>
+          <div className="demo-merge-note">차곡차곡!</div>
           <div className="demo-plank" />
           <div className="demo-sea" />
         </div>

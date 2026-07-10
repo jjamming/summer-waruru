@@ -179,18 +179,6 @@ body,
   color: #1b4a7a;
 }
 
-.landing-tagline {
-  display: inline-block;
-  margin-top: 10px;
-  padding: 6px 14px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.85);
-  font-size: 13px;
-  font-weight: 700;
-  color: #1b4a7a;
-  box-shadow: 0 2px 6px rgba(0, 40, 80, 0.15);
-}
-
 /* 하단 UI 묶음 — 배경 이미지 위에서 가독성 유지 */
 .landing-bottom {
   margin-top: auto;
@@ -636,9 +624,9 @@ body,
   left: 0;
   right: 0;
   text-align: center;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 900;
-  color: #e5484d;
+  color: #2b7bd6;
   text-shadow: 0 1px 0 #fff;
   opacity: 0;
   animation: demo-merge-note-anim 3.2s ease-out infinite;
