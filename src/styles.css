@@ -1,0 +1,693 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  overflow: hidden;
+  background: #4ab3e8;
+}
+
+.app {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  font-family: -apple-system, 'Apple SD Gothic Neo', sans-serif;
+}
+
+.stage {
+  position: relative;
+  height: 100%;
+  max-height: 100vh;
+  max-width: 100vw;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.game-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.hud {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 52px 14px 0;
+  pointer-events: none;
+}
+
+.hud-top {
+  display: flex;
+  justify-content: space-between;
+}
+
+.badge {
+  background: rgba(255, 255, 255, 0.92);
+  color: #1b4a7a;
+  font-weight: 800;
+  font-size: 14px;
+  padding: 7px 12px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 40, 80, 0.18);
+}
+
+.hud-sub {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-top: 10px;
+}
+
+.next-card {
+  margin-left: auto;
+  margin-right: auto;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 12px;
+  padding: 6px 12px 7px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 40, 80, 0.18);
+  /* NEXT 카드를 중앙에 두기 위한 자리 잡기 */
+  transform: translateX(14px);
+}
+
+.next-title {
+  font-size: 10px;
+  font-weight: 800;
+  color: #7b8aa0;
+  letter-spacing: 1px;
+}
+
+.next-emoji {
+  font-size: 26px;
+  line-height: 1.2;
+}
+
+.next-img {
+  height: 30px;
+  max-width: 44px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+
+.next-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: #4a5a72;
+  letter-spacing: 0.5px;
+}
+
+.life-badge {
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 12px;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #d33;
+  box-shadow: 0 2px 6px rgba(0, 40, 80, 0.18);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.life-badge-img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+/* ---------- 랜딩 ---------- */
+
+.landing {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: max(48px, env(safe-area-inset-top)) 24px max(20px, env(safe-area-inset-bottom));
+  /* hero 이미지가 있으면 inline style로 덮어씀 (cover 풀블리드) */
+  background: linear-gradient(180deg, #7ec8f2 0%, #c9ecfa 62%, #f2dfae 100%);
+  background-size: cover;
+  background-position: center;
+  font-family: -apple-system, 'Apple SD Gothic Neo', sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+  overflow-y: auto;
+}
+
+.landing-hero {
+  text-align: center;
+  margin-top: 8px;
+}
+
+.landing-logo {
+  width: min(300px, 78vw);
+  max-width: 100%;
+  filter: drop-shadow(0 4px 10px rgba(0, 30, 70, 0.25));
+}
+
+.landing-title {
+  margin-top: 12px;
+  font-size: 36px;
+  font-weight: 900;
+  color: #1b4a7a;
+}
+
+/* 하단 UI 묶음 — 배경 이미지 위에서 가독성 유지 */
+.landing-bottom {
+  margin-top: auto;
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.landing-hearts {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.78);
+  border-radius: 999px;
+  padding: 8px 18px;
+  box-shadow: 0 2px 8px rgba(0, 40, 80, 0.12);
+}
+
+.landing-hearts-row {
+  font-size: 24px;
+  letter-spacing: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.heart-img {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+}
+
+.landing-hearts-refill {
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #3a6a96;
+}
+
+.landing-cta {
+  margin-top: 16px;
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ---------- 커스텀 버튼 (수박/코랄 톤, 로고와 세트) ---------- */
+
+.btn {
+  -webkit-appearance: none;
+  appearance: none;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  font-family: inherit;
+  font-weight: 800;
+  border-radius: 999px;
+  transition: transform 0.08s ease, filter 0.08s ease;
+  touch-action: manipulation;
+}
+
+.btn:active {
+  transform: scale(0.96) translateY(1px);
+  filter: brightness(0.95);
+}
+
+.btn:disabled {
+  cursor: default;
+  filter: grayscale(0.7) opacity(0.7);
+  transform: none;
+}
+
+.btn-primary {
+  background: linear-gradient(180deg, #ff8a75 0%, #f4574a 55%, #e33d35 100%);
+  color: #fff;
+  font-size: 17px;
+  padding: 14px 20px;
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 5px 0 #b52f2c,
+    0 9px 16px rgba(180, 45, 40, 0.35);
+  text-shadow: 0 1px 2px rgba(150, 30, 25, 0.35);
+}
+
+.btn-primary:active {
+  box-shadow:
+    0 2px 0 #b52f2c,
+    0 5px 10px rgba(180, 45, 40, 0.3);
+}
+
+.btn-xl {
+  font-size: 19px;
+  padding: 16px 20px;
+}
+
+.btn-secondary {
+  background: linear-gradient(180deg, #ffffff, #eaf4fd);
+  color: #2b7bd6;
+  font-size: 15px;
+  padding: 12px 20px;
+  border: 2.5px solid #bcdcf7;
+  box-shadow: 0 4px 0 #a4c8e6, 0 7px 12px rgba(40, 90, 150, 0.18);
+}
+
+.btn-secondary:active {
+  box-shadow: 0 1px 0 #a4c8e6, 0 4px 8px rgba(40, 90, 150, 0.15);
+}
+
+.btn-ghost {
+  background: rgba(255, 255, 255, 0.55);
+  color: #22557f;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 10px 20px;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 2px 6px rgba(0, 40, 80, 0.12);
+}
+
+/* ---------- 게임오버 모달 ---------- */
+
+.modal-dim {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(10, 40, 70, 0.55);
+  animation: fade-in 0.3s ease;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 320px;
+  background: #fff;
+  border-radius: 20px;
+  padding: 24px 20px 18px;
+  text-align: center;
+  box-shadow: 0 8px 28px rgba(0, 20, 50, 0.35);
+  animation: pop-in 0.28s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+
+.modal-emoji {
+  font-size: 40px;
+}
+
+.modal-title {
+  margin-top: 6px;
+  font-size: 22px;
+  font-weight: 900;
+  color: #191f28;
+}
+
+.modal-best-badge {
+  display: inline-block;
+  margin-top: 8px;
+  background: #fff3d6;
+  color: #b8860b;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+
+.modal-score {
+  margin: 16px 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.modal-score-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #8b95a1;
+}
+
+.modal-score-value {
+  font-size: 34px;
+  font-weight: 900;
+  color: #3182f6;
+}
+
+.modal-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal-refill,
+.modal-share-note {
+  font-size: 12px;
+  font-weight: 600;
+  color: #8b95a1;
+}
+
+/* ---------- 튜토리얼 모달 ---------- */
+
+.tutorial-card {
+  position: relative;
+  padding-top: 18px;
+}
+
+.tutorial-close {
+  position: absolute;
+  top: 26px;
+  right: 28px;
+  z-index: 2;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 1px 4px rgba(0, 40, 80, 0.25);
+  font-size: 13px;
+  font-weight: 800;
+  color: #6b7684;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tutorial-title {
+  margin-top: 12px;
+  font-size: 19px;
+  font-weight: 900;
+  color: #191f28;
+}
+
+.tutorial-desc {
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b7684;
+}
+
+.tutorial-dots {
+  margin: 12px 0 14px;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #d8dee5;
+}
+
+.dot.active {
+  background: #f4574a;
+  transform: scale(1.2);
+}
+
+/* ---------- 튜토리얼 데모 (게임 에셋 루프 애니메이션) ---------- */
+
+.demo {
+  position: relative;
+  height: 150px;
+  border-radius: 14px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #8ed0f5 0%, #cdeefb 78%, #f2dfae 100%);
+}
+
+.demo-plank {
+  position: absolute;
+  bottom: 26px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 45%;
+  height: 8px;
+  border-radius: 3px;
+  background: #b8763a;
+}
+
+.demo-sea {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 18px;
+  background: linear-gradient(180deg, #3fb3e0, #1a7fb8);
+}
+
+.demo img,
+.demo .demo-fallback {
+  position: absolute;
+  object-fit: contain;
+}
+
+.demo-fallback {
+  font-size: 30px;
+  line-height: 1;
+}
+
+/* 1단계: 아이템을 잡은 구름이 중앙으로 → 탭 → 아이템만 분리돼 판 위에 안착 (3초 루프)
+   구름·로프·아이템이 한 리그(.demo-crane-rig) 안에 있어 이동 중엔 반드시 같이 움직인다 */
+.demo-crane-rig {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  width: 0;
+  animation: demo-crane-in 3s ease-in-out infinite;
+}
+
+.demo-crane {
+  width: 54px;
+  left: -27px;
+  top: 0;
+}
+
+/* 구름이 아이템을 잡고 있는 로프 — 투하 후에도 그대로 남는다 */
+.demo-rope {
+  position: absolute;
+  left: -1px;
+  top: 30px;
+  width: 2.5px;
+  height: 14px;
+  border-radius: 2px;
+  background: #7a6a55;
+}
+
+.demo-hang {
+  width: 30px;
+  left: -15px;
+  top: 44px;
+  animation: demo-hang-drop 3s infinite;
+}
+
+@keyframes demo-crane-in {
+  0% {
+    transform: translateX(-58px);
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  40%,
+  94% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+}
+
+/* 리그 내부에서 Y만 움직이므로 X는 항상 구름과 일치 */
+@keyframes demo-hang-drop {
+  0%,
+  55% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.45, 0, 1, 1);
+  }
+  72%,
+  100% {
+    /* 판 윗면(top edge)에 안착해 유지 */
+    transform: translateY(38px);
+  }
+}
+
+.demo-tap {
+  position: absolute;
+  right: 22px;
+  bottom: 44px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.95);
+  opacity: 0;
+  animation: demo-tap-pulse 3s ease-out infinite;
+}
+
+@keyframes demo-tap-pulse {
+  0%,
+  42% {
+    transform: scale(0.55);
+    opacity: 0;
+  }
+  48% {
+    opacity: 1;
+  }
+  60%,
+  100% {
+    transform: scale(1.3);
+    opacity: 0;
+  }
+}
+
+/* 2단계: 실제 matter.js 캔버스 (PhysicsDemo) */
+.demo-canvas {
+  display: block;
+  width: 100%;
+  height: 150px;
+}
+
+/* 3단계: 순서대로 쌓이며 점수 */
+/* 등장은 순차, 사라짐은 셋이 동시에 (delay 대신 키프레임에 시차를 새겨 같은 사이클 공유) */
+.demo-stack-1 {
+  width: 40px;
+  left: calc(50% - 20px);
+  bottom: 34px;
+  opacity: 0;
+  animation: demo-stack-pop-1 2.4s ease-out infinite;
+}
+
+.demo-stack-2 {
+  width: 32px;
+  left: calc(50% - 16px);
+  bottom: 62px;
+  opacity: 0;
+  animation: demo-stack-pop-2 2.4s ease-out infinite;
+}
+
+.demo-stack-3 {
+  width: 34px;
+  left: calc(50% - 17px);
+  bottom: 88px;
+  opacity: 0;
+  animation: demo-stack-pop-3 2.4s ease-out infinite;
+}
+
+@keyframes demo-stack-pop-1 {
+  0% {
+    opacity: 0;
+    transform: translateY(-26px);
+  }
+  10%,
+  92% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+}
+
+@keyframes demo-stack-pop-2 {
+  0%,
+  16% {
+    opacity: 0;
+    transform: translateY(-26px);
+  }
+  26%,
+  92% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+}
+
+@keyframes demo-stack-pop-3 {
+  0%,
+  32% {
+    opacity: 0;
+    transform: translateY(-26px);
+  }
+  42%,
+  92% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+}
+
+.demo-score {
+  position: absolute;
+  top: 12px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 900;
+  color: #f4574a;
+  text-shadow: 0 1px 0 #fff;
+  animation: demo-score-anim 2.4s ease-out infinite;
+}
+
+@keyframes demo-score-anim {
+  0%,
+  42% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  55%,
+  92% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.86);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
