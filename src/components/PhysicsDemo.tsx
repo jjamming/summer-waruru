@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import Matter from 'matter-js';
 import { getItemImage } from '../game/assets';
+import { createItemBody, spriteMetrics } from '../game/bodies';
 import { itemById, type ItemDef } from '../game/items';
 
 /**
@@ -24,6 +25,8 @@ const STACK: { id: string; offsetX: number }[] = [
 ];
 
 function sizeOf(def: ItemDef): { w: number; h: number } {
+  const m = spriteMetrics(def);
+  if (m) return { w: m.w * SCALE, h: m.h * SCALE };
   switch (def.shape.kind) {
     case 'circle':
       return { w: def.shape.radius * 2 * SCALE, h: def.shape.radius * 2 * SCALE };
@@ -31,19 +34,6 @@ function sizeOf(def: ItemDef): { w: number; h: number } {
     case 'capsule':
       return { w: def.shape.width * SCALE, h: def.shape.height * SCALE };
   }
-}
-
-function createBody(def: ItemDef, x: number, y: number): Matter.Body {
-  const opts: Matter.IChamferableBodyDefinition = {
-    density: def.density,
-    friction: def.friction,
-    restitution: def.restitution,
-    frictionAir: 0.02,
-  };
-  const { w, h } = sizeOf(def);
-  return def.shape.kind === 'circle'
-    ? Matter.Bodies.circle(x, y, w / 2, opts)
-    : Matter.Bodies.rectangle(x, y, w, h, opts);
 }
 
 export default function PhysicsDemo() {
@@ -85,7 +75,7 @@ export default function PhysicsDemo() {
         const def = itemById(id);
         const { h } = sizeOf(def);
         y -= h / 2;
-        const body = createBody(def, W / 2 + offsetX, y);
+        const body = createItemBody(def, W / 2 + offsetX, y, SCALE);
         items.push({ body, def });
         Matter.Composite.add(engine.world, body);
         y -= h / 2 - 1;
@@ -114,14 +104,17 @@ export default function PhysicsDemo() {
       ctx.roundRect((W - plankW) / 2, plankTopY, plankW, PLANK_H, 3);
       ctx.fill();
 
-      // 아이템
+      // 아이템 (게임 렌더러와 동일하게 폴리곤 centroid 보정 정렬)
       for (const { body, def } of items) {
         const { w, h } = sizeOf(def);
         ctx.save();
         ctx.translate(body.position.x, body.position.y);
         ctx.rotate(body.angle);
         const img = getItemImage(def.id);
-        if (img) {
+        const m = spriteMetrics(def);
+        if (img && m) {
+          ctx.drawImage(img, -w / 2 - m.centroidX * SCALE, -h / 2 - m.centroidY * SCALE, w, h);
+        } else if (img) {
           const dw = w * 1.15;
           const dh = dw * (img.naturalHeight / img.naturalWidth);
           ctx.drawImage(img, -dw / 2, -dh / 2, dw, dh);

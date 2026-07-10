@@ -9,6 +9,7 @@
 - `pnpm exec vite dev` — 순수 웹 dev 서버 (localhost:5173, 로컬 플레이 확인용)
 - `pnpm exec tsc --noEmit` — 타입체크
 - `pnpm build` — ait build (.ait 아티팩트 생성)
+- `python3 scripts/gen-hitboxes.py` — 아이템 이미지 교체·추가 시 충돌 폴리곤 재생성 (src/game/hitboxes.json)
 
 ## 구조
 

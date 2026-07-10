@@ -4,6 +4,7 @@
  */
 
 import Matter from 'matter-js';
+import { createItemBody, spriteMetrics } from './bodies';
 import { GAME_CONFIG as C } from './config';
 import type { ItemDef } from './items';
 import { createItemSequence, randomSeed } from './rng';
@@ -119,7 +120,7 @@ export class GameEngine {
     this.phase = 'playing';
 
     const def = this.current;
-    const body = this.createBody(def, this.craneX, C.craneY + this.hangOffset(def));
+    const body = createItemBody(def, this.craneX, C.craneY + this.hangOffset(def));
     this.items.push({ body, def, scored: false, settleCount: 0 });
     Matter.Composite.add(this.engine.world, body);
 
@@ -129,35 +130,16 @@ export class GameEngine {
     this.holdTimerMs = C.dropCooldownMs;
   }
 
-  /** 크레인 고리 아래 아이템 중심까지의 거리 — 로프 끝에 바로 맞닿게 */
+  /** 크레인 고리 아래 아이템(바디 원점)까지의 거리 — 스프라이트 윗변이 로프 끝에 맞닿게 */
   hangOffset(def: ItemDef): number {
+    const m = spriteMetrics(def);
+    if (m) return m.h / 2 + m.centroidY + 2;
     switch (def.shape.kind) {
       case 'circle':
         return def.shape.radius + 2;
       case 'box':
       case 'capsule':
         return def.shape.height / 2 + 2;
-    }
-  }
-
-  private createBody(def: ItemDef, x: number, y: number): Matter.Body {
-    const opts: Matter.IChamferableBodyDefinition = {
-      density: def.density,
-      friction: def.friction,
-      restitution: def.restitution,
-      frictionAir: C.frictionAir,
-      label: def.id,
-    };
-    switch (def.shape.kind) {
-      case 'circle':
-        return Matter.Bodies.circle(x, y, def.shape.radius, opts);
-      case 'box':
-        return Matter.Bodies.rectangle(x, y, def.shape.width, def.shape.height, opts);
-      case 'capsule':
-        return Matter.Bodies.rectangle(x, y, def.shape.width, def.shape.height, {
-          ...opts,
-          chamfer: { radius: def.shape.height / 2 - 1 },
-        });
     }
   }
 

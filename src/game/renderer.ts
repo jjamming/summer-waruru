@@ -4,9 +4,13 @@
  */
 
 import { getItemImage, getSceneImage } from './assets';
+import { spriteMetrics } from './bodies';
 import { GAME_CONFIG as C } from './config';
 import type { GameEngine, DroppedItem } from './engine';
 import type { ItemDef } from './items';
+
+/** ?hitbox 쿼리로 충돌 폴리곤 표시 (개발 검증용) */
+const DEBUG_HITBOX = typeof location !== 'undefined' && location.search.includes('hitbox');
 
 /**
  * 블리드 뷰포트: 논리 폭은 400 고정, 높이는 화면 비율만큼 늘어난다.
@@ -79,12 +83,18 @@ function drawItemSprite(
     drawEmoji(ctx, def.emoji, x, y, emojiFontSize(def), angle);
     return;
   }
-  const w = emojiFontSize(def) * 1.06;
-  const h = w * (img.naturalHeight / img.naturalWidth);
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(angle);
-  ctx.drawImage(img, -w / 2, -h / 2, w, h);
+  const m = spriteMetrics(def);
+  if (m) {
+    // 바디 원점 = 충돌 폴리곤 centroid — 스프라이트를 역보정해 물리와 픽셀 단위로 정렬
+    ctx.drawImage(img, -m.w / 2 - m.centroidX, -m.h / 2 - m.centroidY, m.w, m.h);
+  } else {
+    const w = emojiFontSize(def) * 1.06;
+    const h = w * (img.naturalHeight / img.naturalWidth);
+    ctx.drawImage(img, -w / 2, -h / 2, w, h);
+  }
   ctx.restore();
 }
 
@@ -223,6 +233,16 @@ function drawCrane(ctx: CanvasRenderingContext2D, engine: GameEngine) {
 function drawItems(ctx: CanvasRenderingContext2D, items: readonly DroppedItem[]) {
   for (const item of items) {
     drawItemSprite(ctx, item.def, item.body.position.x, item.body.position.y, item.body.angle);
+  }
+  if (DEBUG_HITBOX) {
+    ctx.strokeStyle = 'rgba(255,0,90,0.9)';
+    ctx.lineWidth = 1.5;
+    for (const item of items) {
+      ctx.beginPath();
+      item.body.vertices.forEach((v, i) => (i === 0 ? ctx.moveTo(v.x, v.y) : ctx.lineTo(v.x, v.y)));
+      ctx.closePath();
+      ctx.stroke();
+    }
   }
 }
 
