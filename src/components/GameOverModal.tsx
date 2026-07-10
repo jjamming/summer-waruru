@@ -25,8 +25,7 @@ export default function GameOverModal({ score, isNewBest, hearts, onRetry, onHom
     // 캔버스 탭(투하)과 분리 — 모달 안 터치는 게임에 전달하지 않는다
     <div className="modal-dim" onPointerDown={(e) => e.stopPropagation()}>
       <div className="modal-card">
-        <div className="modal-emoji">🌊</div>
-        <h2 className="modal-title">게임 끝!</h2>
+        <h2 className="modal-title">게임 종료!</h2>
         {isNewBest && <div className="modal-best-badge">🏆 최고 기록 달성</div>}
         <div className="modal-score">
           <span className="modal-score-label">점수</span>

@@ -324,10 +324,6 @@ body,
   animation: pop-in 0.28s cubic-bezier(0.2, 1.4, 0.4, 1);
 }
 
-.modal-emoji {
-  font-size: 40px;
-}
-
 .modal-title {
   margin-top: 6px;
   font-size: 22px;
