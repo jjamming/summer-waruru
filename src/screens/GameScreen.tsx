@@ -6,13 +6,15 @@ import { GameEngine, type GameSnapshot } from '../game/engine';
 import { getItemImageUrl, getSceneUrl } from '../game/assets';
 import { render, setupCanvas } from '../game/renderer';
 import { consumeHeart, heartsLeft } from '../lib/hearts';
+import { kvGet, kvSet } from '../lib/kv';
 import { hasSeenHowto, markHowtoSeen } from '../lib/howto';
+import { sfx, unlockAudio } from '../lib/sound';
 import { LANDSCAPE_QUERY, WIDE_LAYOUT_QUERY, useMediaQuery } from '../lib/useMedia';
 
 const BEST_KEY = 'summer-waruru:best';
 
 function loadBest(): number {
-  return Number(localStorage.getItem(BEST_KEY)) || 0;
+  return Number(kvGet(BEST_KEY)) || 0;
 }
 
 interface Props {
@@ -41,10 +43,14 @@ export default function GameScreen({ onHome }: Props) {
   const startGame = useCallback(() => {
     engineRef.current?.destroy();
     engineRef.current = new GameEngine({
+      onScore: () => sfx.land(),
       onGameOver: (score) => {
+        sfx.splash();
         setBest((prev) => {
           const next = Math.max(prev, score);
-          localStorage.setItem(BEST_KEY, String(next));
+          kvSet(BEST_KEY, String(next));
+          // 풍덩 소리가 잦아든 뒤 결과음
+          setTimeout(() => (score >= prev && score > 0 ? sfx.newBest() : sfx.gameover()), 450);
           return next;
         });
       },
@@ -84,9 +90,12 @@ export default function GameScreen({ onHome }: Props) {
   }, [startGame]);
 
   const handleTap = useCallback(() => {
+    unlockAudio(); // 사용자 제스처 시점에 iOS 오디오 잠금 해제
     const engine = engineRef.current;
     if (!engine || engine.phase === 'gameover' || pausedRef.current) return;
+    const wasHolding = engine.holding;
     engine.drop();
+    if (wasHolding) sfx.drop();
   }, []);
 
   const isGameOver = snap?.phase === 'gameover';

@@ -3,6 +3,7 @@ import RotateOverlay from './components/RotateOverlay';
 import GameScreen from './screens/GameScreen';
 import LandingScreen from './screens/LandingScreen';
 import { consumeHeart } from './lib/hearts';
+import { kvSet } from './lib/kv';
 import { PHONE_LANDSCAPE_QUERY, useMediaQuery } from './lib/useMedia';
 
 export default function App() {
@@ -24,6 +25,12 @@ export default function App() {
       .then((m) => {
         m.setDeviceOrientation({ type: 'portrait' }).catch(() => {});
         m.setIosSwipeGestureEnabled({ isEnabled: false }).catch(() => {});
+        // 사용자 식별키 발급·저장 (출시 체크리스트 3번, 리더보드 대비)
+        m.getUserKeyForGame()
+          .then((key) => {
+            if (key) kvSet('summer-waruru:user-key', String(key));
+          })
+          .catch(() => {});
       })
       .catch(() => {});
   }, []);

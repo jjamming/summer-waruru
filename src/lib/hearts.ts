@@ -1,8 +1,10 @@
 /**
- * 하트(게임 입장권) 시스템 — localStorage 기반.
+ * 하트(게임 입장권) 시스템 — kv 저장소 기반 (localStorage + 토스 네이티브 미러).
  * 최대 5개. 게임 시작마다 1개 차감, 각 하트는 사용 시점부터 24시간 뒤 개별 회복.
  * 저장값: 아직 회복되지 않은 사용 시각(ms) 배열.
  */
+
+import { kvGet, kvSet } from './kv';
 
 const KEY = 'summer-waruru:hearts:v1';
 
@@ -12,7 +14,7 @@ export const HEART_REFILL_MS = 24 * 60 * 60 * 1000;
 /** 회복 안 된 사용 기록만 남긴다 */
 function loadUsedAt(now: number): number[] {
   try {
-    const raw = JSON.parse(localStorage.getItem(KEY) ?? '[]');
+    const raw = JSON.parse(kvGet(KEY) ?? '[]');
     if (!Array.isArray(raw)) return [];
     return raw
       .filter((t): t is number => typeof t === 'number')
@@ -23,7 +25,7 @@ function loadUsedAt(now: number): number[] {
 }
 
 function save(usedAt: number[]) {
-  localStorage.setItem(KEY, JSON.stringify(usedAt));
+  kvSet(KEY, JSON.stringify(usedAt));
 }
 
 export function heartsLeft(now = Date.now()): number {

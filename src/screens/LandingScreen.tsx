@@ -3,6 +3,7 @@ import TutorialModal from '../components/TutorialModal';
 import { getSceneUrl } from '../game/assets';
 import { MAX_HEARTS, formatRemaining, heartsLeft, nextRefillAt } from '../lib/hearts';
 import { markHowtoSeen } from '../lib/howto';
+import { isSoundOn, setSoundOn } from '../lib/sound';
 import { WIDE_LAYOUT_QUERY, useMediaQuery } from '../lib/useMedia';
 
 interface Props {
@@ -25,6 +26,12 @@ export default function LandingScreen({ onStart }: Props) {
 
   // 게임 방법 버튼으로 여는 재열람 모달 (최초 자동 노출은 게임 화면에서 처리)
   const [tutorial, setTutorial] = useState(false);
+  // 사운드 On/Off (출시 체크리스트: 사용자가 직접 설정 가능)
+  const [soundOn, setSoundOnState] = useState(isSoundOn);
+  const toggleSound = () => {
+    setSoundOn(!soundOn);
+    setSoundOnState(!soundOn);
+  };
 
   const hearts = heartsLeft(now);
   const refillAt = nextRefillAt(now);
@@ -40,6 +47,14 @@ export default function LandingScreen({ onStart }: Props) {
 
   return (
     <div className="landing" style={heroUrl ? { backgroundImage: `url(${heroUrl})` } : undefined}>
+      <button
+        className="sound-toggle"
+        onClick={toggleSound}
+        aria-label={soundOn ? '사운드 끄기' : '사운드 켜기'}
+      >
+        {soundOn ? '🔊' : '🔇'}
+      </button>
+
       <div className="landing-hero">
         {logoUrl ? (
           <img className="landing-logo" src={logoUrl} alt="여름 와르르!" />
