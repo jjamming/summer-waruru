@@ -70,7 +70,13 @@ export function spriteMetrics(def: ItemDef): SpriteMetrics | null {
   const w = spriteWidth(def);
   const h = w * hb.aspect;
   const c = polygonCentroid(hb.verts);
-  const m: SpriteMetrics = { w, h, centroidX: c.x * w, centroidY: c.y * h };
+  // comOffsetY로 무게중심을 옮기면 바디 원점도 함께 이동 — 렌더 보정에 포함
+  const m: SpriteMetrics = {
+    w,
+    h,
+    centroidX: c.x * w,
+    centroidY: c.y * h + (def.comOffsetY ?? 0),
+  };
   metricsCache.set(def.id, m);
   return m;
 }
@@ -97,7 +103,12 @@ export function createItemBody(def: ItemDef, x: number, y: number, scale = 1): M
   const verts = hitboxVerts(def, scale);
   if (verts) {
     // fromVertices는 바디 원점을 폴리곤 centroid에 둔다 (렌더 시 spriteMetrics로 보정)
-    return Matter.Bodies.fromVertices(x, y, [verts], opts);
+    const body = Matter.Bodies.fromVertices(x, y, [verts], opts);
+    if (def.comOffsetY) {
+      // 무게중심을 아래로 — 위가 무거운 아이템(팥빙수 등)이 덜 넘어지게
+      Matter.Body.setCentre(body, { x: 0, y: def.comOffsetY * scale }, true);
+    }
+    return body;
   }
 
   switch (def.shape.kind) {

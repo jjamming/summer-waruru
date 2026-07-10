@@ -16,6 +16,11 @@ MAX_VERTS = 16
 ALPHA_THRESHOLD = 30
 SAMPLE_MAX = 256  # 컨투어 계산용 다운스케일 (정밀도 충분 + 빠름)
 
+# 바닥 평탄화: 아래쪽 n% 구간의 꼭짓점을 바닥선으로 스냅 (받침이 좁아 기우뚱거리는 아이템용)
+FLAT_BOTTOM = {
+    'patbingsu': 0.12,
+}
+
 def trace_contour(mask, w, h):
     """픽셀 경계선(edge) 체이닝으로 외곽 컨투어 추적.
 
@@ -114,6 +119,15 @@ def main():
         if abs(polygon_area(verts)) < 4:
             print(f'skip {item_id}: degenerate polygon')
             continue
+
+        flat = FLAT_BOTTOM.get(item_id)
+        if flat:
+            y_max = max(y for _, y in verts)
+            y_min = min(y for _, y in verts)
+            cut = y_max - (y_max - y_min) * flat
+            verts = [(x, y_max if y > cut else y) for x, y in verts]
+            # 스냅으로 생긴 중복점 제거
+            verts = [p for i, p in enumerate(verts) if p != verts[i - 1]]
 
         # 이미지 중심 원점, 폭/높이 대비 정규화 (-0.5 ~ 0.5)
         out[item_id] = {

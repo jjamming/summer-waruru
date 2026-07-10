@@ -22,6 +22,8 @@ export interface ItemDef {
   weight: number;
   /** 초반 보장 등장 아이템 (평평·안정 — "쌓는 게임" 멘탈모델 형성용, rng.ts 참고) */
   opener?: boolean;
+  /** 무게중심 세로 오프셋 (논리 px, +아래) — 유리잔처럼 위가 무거운 아이템 안정화 */
+  comOffsetY?: number;
 }
 
 export const ITEMS: ItemDef[] = [
@@ -29,7 +31,7 @@ export const ITEMS: ItemDef[] = [
     id: 'watermelon',
     label: '수박',
     emoji: '🍉',
-    shape: { kind: 'circle', radius: 27 },
+    shape: { kind: 'circle', radius: 23 },
     points: 50,
     density: 0.0022,
     friction: 0.55,
@@ -96,6 +98,7 @@ export const ITEMS: ItemDef[] = [
     restitution: 0.02,
     weight: 12,
     opener: true,
+    comOffsetY: 10,
   },
   {
     id: 'watermelon-slice',
