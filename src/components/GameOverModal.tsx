@@ -1,19 +1,48 @@
 import { useState } from 'react';
+import { getItemImageUrl } from '../game/assets';
+import type { ItemDef } from '../game/items';
 import { formatRemaining, nextRefillAt } from '../lib/hearts';
 import { shareScore } from '../lib/share';
 
 interface Props {
   score: number;
+  best: number;
   isNewBest: boolean;
+  /** 바다에 빠져 게임을 끝낸 아이템 */
+  culprit: ItemDef | null;
+  /** 이번 판에 쌓은(득점한) 아이템 수 */
+  stackedCount: number;
   hearts: number;
   onRetry: () => void;
   onHome: () => void;
 }
 
-export default function GameOverModal({ score, isNewBest, hearts, onRetry, onHome }: Props) {
+/** '수박이' / '튜브가' — 받침 유무로 주격 조사 선택 */
+function withSubjectParticle(word: string): string {
+  const code = word.charCodeAt(word.length - 1);
+  if (code < 0xac00 || code > 0xd7a3) return `${word}이(가)`;
+  return word + ((code - 0xac00) % 28 > 0 ? '이' : '가');
+}
+
+export default function GameOverModal({
+  score,
+  best,
+  isNewBest,
+  culprit,
+  stackedCount,
+  hearts,
+  onRetry,
+  onHome,
+}: Props) {
   const [shareNote, setShareNote] = useState<string | null>(null);
   const canRetry = hearts > 0;
   const refillAt = nextRefillAt();
+
+  // "아까웠다" 프레이밍: 최고 기록의 80% 이상으로 아쉽게 못 미쳤을 때
+  const gapToBest = best - score;
+  const nearMiss = !isNewBest && best > 0 && gapToBest > 0 && score >= best * 0.8;
+
+  const culpritUrl = culprit ? getItemImageUrl(culprit.id) : null;
 
   const handleShare = async () => {
     const result = await shareScore(score);
@@ -26,11 +55,29 @@ export default function GameOverModal({ score, isNewBest, hearts, onRetry, onHom
     <div className="modal-dim" onPointerDown={(e) => e.stopPropagation()}>
       <div className="modal-card">
         <h2 className="modal-title">게임 종료!</h2>
+
+        {culprit && (
+          <p className="modal-culprit">
+            {culpritUrl ? (
+              <img className="modal-culprit-img" src={culpritUrl} alt="" />
+            ) : (
+              <span>{culprit.emoji}</span>
+            )}
+            {withSubjectParticle(culprit.label)} 바다에 빠졌어요
+          </p>
+        )}
+
         {isNewBest && <div className="modal-best-badge">🏆 최고 기록 달성</div>}
+
         <div className="modal-score">
           <span className="modal-score-label">점수</span>
           <span className="modal-score-value">{score.toLocaleString()}</span>
+          {stackedCount > 0 && (
+            <span className="modal-summary">아이템 {stackedCount}개를 쌓았어요</span>
+          )}
         </div>
+
+        {nearMiss && <p className="modal-near-miss">최고 기록까지 단 {gapToBest.toLocaleString()}점!</p>}
 
         <div className="modal-actions">
           <button className="btn btn-primary" disabled={!canRetry} onClick={onRetry}>

@@ -90,6 +90,17 @@ export default function GameScreen({ onHome }: Props) {
 
   const isGameOver = snap?.phase === 'gameover';
 
+  // 게임오버 연출: 탑이 무너지는 걸 잠깐 보여준 뒤 모달 (물리는 계속 돈다)
+  const [gameOverVisible, setGameOverVisible] = useState(false);
+  useEffect(() => {
+    if (!isGameOver) {
+      setGameOverVisible(false);
+      return;
+    }
+    const t = setTimeout(() => setGameOverVisible(true), 1100);
+    return () => clearTimeout(t);
+  }, [isGameOver]);
+
   // 넓은 화면에선 스테이지 좌우 여백을 가로판 배경으로 채움 (없으면 기본 단색)
   const wide = useMediaQuery(WIDE_LAYOUT_QUERY);
   const wideBgUrl = wide ? getSceneUrl('background-wide') : null;
@@ -144,10 +155,13 @@ export default function GameScreen({ onHome }: Props) {
           </div>
         )}
 
-        {isGameOver && snap && (
+        {isGameOver && gameOverVisible && snap && (
           <GameOverModal
             score={snap.score}
+            best={best}
             isNewBest={snap.score >= best && snap.score > 0}
+            culprit={snap.culprit}
+            stackedCount={snap.stackedCount}
             hearts={hearts}
             onRetry={handleRetry}
             onHome={onHome}

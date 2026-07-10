@@ -331,6 +331,37 @@ body,
   color: #191f28;
 }
 
+.modal-culprit {
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #4e5968;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.modal-culprit-img {
+  height: 20px;
+  max-width: 30px;
+  object-fit: contain;
+}
+
+.modal-summary {
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b7684;
+}
+
+.modal-near-miss {
+  margin: -8px 0 14px;
+  font-size: 14px;
+  font-weight: 800;
+  color: #f4574a;
+}
+
 .modal-best-badge {
   display: inline-block;
   margin-top: 8px;

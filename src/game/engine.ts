@@ -29,6 +29,10 @@ export interface GameSnapshot {
   next: ItemDef;
   /** 크레인에 아이템이 매달려 있는지 (쿨다운 중이면 false) */
   holding: boolean;
+  /** 게임오버 원인 아이템 (바다에 빠진 것) */
+  culprit: ItemDef | null;
+  /** 착지 득점에 성공한 아이템 수 */
+  stackedCount: number;
 }
 
 export interface GameEvents {
@@ -203,6 +207,8 @@ export class GameEngine {
       current: this.current,
       next: this.next,
       holding: this.holding,
+      culprit: this.culprit,
+      stackedCount: this.items.reduce((n, it) => n + (it.scored ? 1 : 0), 0),
     };
   }
 
