@@ -13,15 +13,17 @@ import type { ItemDef } from './items';
 const DEBUG_HITBOX = typeof location !== 'undefined' && location.search.includes('hitbox');
 
 /**
- * 블리드 뷰포트: 논리 폭은 400 고정, 높이는 화면 비율만큼 늘어난다.
- * 게임 월드(400×720)는 top 오프셋 위치에 고정되고, 나머지는 배경 블리드로만 채운다
- * → 기기 비율이 달라도 게임플레이는 동일.
+ * 블리드 뷰포트: 캔버스가 화면 전체를 덮고, 게임 월드(400×720)는 중앙에 고정된다.
+ * 좌우·상하 여분은 배경 이미지 블리드로만 채운다 → 기기 비율이 달라도 게임플레이는 동일.
+ * (해상도 가이드: 단일 논리 해상도 + 스케일링 대응)
  */
 export interface Viewport {
   w: number;
   h: number;
   /** 월드(720) 위쪽 여백 — 여분의 25%만 위로 (크레인이 HUD에서 멀어지지 않게) */
   top: number;
+  /** 월드(400) 왼쪽 여백 — 수평 중앙 정렬 */
+  left: number;
 }
 
 export function setupCanvas(canvas: HTMLCanvasElement): {
@@ -29,16 +31,26 @@ export function setupCanvas(canvas: HTMLCanvasElement): {
   vp: Viewport;
 } {
   const stage = canvas.parentElement!;
-  const logicalH = Math.max(
-    C.height,
-    Math.round((C.width * stage.clientHeight) / stage.clientWidth),
-  );
+  const cssW = stage.clientWidth || C.width;
+  const cssH = stage.clientHeight || C.height;
+  // 월드가 온전히 들어가는 최대 스케일 → 논리 크기는 월드보다 크거나 같다
+  const scale = Math.min(cssW / C.width, cssH / C.height);
+  const logicalW = Math.max(C.width, Math.round(cssW / scale));
+  const logicalH = Math.max(C.height, Math.round(cssH / scale));
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  canvas.width = C.width * dpr;
+  canvas.width = logicalW * dpr;
   canvas.height = logicalH * dpr;
   const ctx = canvas.getContext('2d')!;
   ctx.scale(dpr, dpr);
-  return { ctx, vp: { w: C.width, h: logicalH, top: Math.round((logicalH - C.height) * 0.25) } };
+  return {
+    ctx,
+    vp: {
+      w: logicalW,
+      h: logicalH,
+      top: Math.round((logicalH - C.height) * 0.25),
+      left: Math.round((logicalW - C.width) / 2),
+    },
+  };
 }
 
 function emojiFontSize(def: ItemDef): number {
@@ -120,7 +132,35 @@ function edgeColors(img: HTMLImageElement): { top: string; bottom: string } {
   return colors;
 }
 
+/** 배경 물결선의 월드 y — 세로판 배경의 실측값 기준 (이미지 교체 시 재측정) */
+const WATERLINE_WORLD_Y = 599;
+/** 가로판 배경에서 물결선의 세로 위치 비율 (실측) */
+const WIDE_WATERLINE_FRAC = 0.793;
+
 function drawBackground(ctx: CanvasRenderingContext2D, vp: Viewport) {
+  // 넓은 화면: 가로판 이미지 한 장을 물결선 기준으로 월드에 정렬 (딤·블러 없이 자연스럽게)
+  const wideBg = vp.w > C.width + 2 ? getSceneImage('background-wide') : null;
+  if (wideBg) {
+    const edge = edgeColors(wideBg);
+    const waterY = vp.top + WATERLINE_WORLD_Y;
+    ctx.fillStyle = edge.top;
+    ctx.fillRect(0, 0, vp.w, waterY);
+    ctx.fillStyle = edge.bottom;
+    ctx.fillRect(0, waterY, vp.w, vp.h - waterY);
+
+    // 세 가지 커버 조건을 만족하는 최소 스케일:
+    // ① 물결선 위로 캔버스 상단까지 ② 물결선 아래로 캔버스 하단까지 ③ 좌우 폭
+    const aspect = wideBg.naturalWidth / wideBg.naturalHeight;
+    const dh = Math.max(
+      waterY / WIDE_WATERLINE_FRAC,
+      (vp.h - waterY) / (1 - WIDE_WATERLINE_FRAC),
+      vp.w / aspect,
+    );
+    const dw = dh * aspect;
+    ctx.drawImage(wideBg, (vp.w - dw) / 2, waterY - WIDE_WATERLINE_FRAC * dh, dw, dh);
+    return;
+  }
+
   const bg = getSceneImage('background');
   if (bg) {
     // 백스톱: 이미지 블리드가 화면보다 짧아도(초장신 기기) 가장자리 색으로 이어진다
@@ -135,7 +175,7 @@ function drawBackground(ctx: CanvasRenderingContext2D, vp: Viewport) {
     // 구형 9:16 이미지도 dh === C.height로 동일하게 동작.
     const scale = C.width / bg.naturalWidth;
     const dh = bg.naturalHeight * scale;
-    ctx.drawImage(bg, 0, vp.top + (C.height - dh) / 2, C.width, dh);
+    ctx.drawImage(bg, vp.left, vp.top + (C.height - dh) / 2, C.width, dh);
     return;
   }
 
@@ -147,19 +187,19 @@ function drawBackground(ctx: CanvasRenderingContext2D, vp: Viewport) {
   sky.addColorStop(0, '#7ec8f2');
   sky.addColorStop(1, '#c9ecfa');
   ctx.fillStyle = sky;
-  ctx.fillRect(0, 0, C.width, seaY);
+  ctx.fillRect(0, 0, vp.w, seaY);
 
   // 해
-  drawEmoji(ctx, '☀️', 46, vp.top + 60, 44);
+  drawEmoji(ctx, '☀️', vp.left + 46, vp.top + 60, 44);
 
   // 야자수
-  drawEmoji(ctx, '🌴', 30, vp.top + C.platformY - 30, 72);
-  drawEmoji(ctx, '🌴', C.width - 30, vp.top + C.platformY - 36, 84);
+  drawEmoji(ctx, '🌴', vp.left + 30, vp.top + C.platformY - 30, 72);
+  drawEmoji(ctx, '🌴', vp.left + C.width - 30, vp.top + C.platformY - 36, 84);
 
   // 모래사장 (판 뒤쪽)
   ctx.fillStyle = '#f2dfae';
   ctx.beginPath();
-  ctx.ellipse(C.width / 2, seaY + 8, C.width * 0.62, 42, 0, Math.PI, 2 * Math.PI);
+  ctx.ellipse(vp.left + C.width / 2, seaY + 8, C.width * 0.62, 42, 0, Math.PI, 2 * Math.PI);
   ctx.fill();
 
   // 바다 (VOID, 캔버스 맨 아래까지)
@@ -167,7 +207,7 @@ function drawBackground(ctx: CanvasRenderingContext2D, vp: Viewport) {
   sea.addColorStop(0, '#3fb3e0');
   sea.addColorStop(1, '#1a7fb8');
   ctx.fillStyle = sea;
-  ctx.fillRect(0, seaY, C.width, vp.h - seaY);
+  ctx.fillRect(0, seaY, vp.w, vp.h - seaY);
 
   // 물결
   ctx.strokeStyle = 'rgba(255,255,255,0.55)';
@@ -175,7 +215,7 @@ function drawBackground(ctx: CanvasRenderingContext2D, vp: Viewport) {
   for (let i = 0; i < 3; i++) {
     const y = seaY + 14 + i * 16;
     ctx.beginPath();
-    for (let x = 0; x <= C.width; x += 8) {
+    for (let x = 0; x <= vp.w; x += 8) {
       const wy = y + Math.sin((x + i * 40) / 18) * 3;
       x === 0 ? ctx.moveTo(x, wy) : ctx.lineTo(x, wy);
     }
@@ -253,9 +293,9 @@ function drawItems(ctx: CanvasRenderingContext2D, items: readonly DroppedItem[])
 export function render(ctx: CanvasRenderingContext2D, engine: GameEngine, vp: Viewport) {
   ctx.clearRect(0, 0, vp.w, vp.h);
   drawBackground(ctx, vp);
-  // 게임 월드는 vp.top 아래에 고정 — 기기 비율과 무관하게 동일한 플레이 영역
+  // 게임 월드는 중앙(vp.left, vp.top)에 고정 — 기기 비율과 무관하게 동일한 플레이 영역
   ctx.save();
-  ctx.translate(0, vp.top);
+  ctx.translate(vp.left, vp.top);
   drawPlatforms(ctx, engine);
   drawItems(ctx, engine.droppedItems);
   drawCrane(ctx, engine);

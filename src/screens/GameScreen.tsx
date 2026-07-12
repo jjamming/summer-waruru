@@ -9,7 +9,7 @@ import { consumeHeart, heartsLeft } from '../lib/hearts';
 import { kvGet, kvSet } from '../lib/kv';
 import { hasSeenHowto, markHowtoSeen } from '../lib/howto';
 import { sfx, unlockAudio } from '../lib/sound';
-import { LANDSCAPE_QUERY, WIDE_LAYOUT_QUERY, useMediaQuery } from '../lib/useMedia';
+import { LANDSCAPE_QUERY, useMediaQuery } from '../lib/useMedia';
 
 const BEST_KEY = 'summer-waruru:best';
 
@@ -111,14 +111,8 @@ export default function GameScreen({ onHome }: Props) {
     return () => clearTimeout(t);
   }, [isGameOver]);
 
-  // 넓은 화면에선 스테이지 좌우 여백을 가로판 배경으로 채움 (없으면 기본 단색)
-  const wide = useMediaQuery(WIDE_LAYOUT_QUERY);
-  const wideBgUrl = wide ? getSceneUrl('background-wide') : null;
-
   return (
     <div className="app" onPointerDown={handleTap}>
-      {/* 스테이지 좌우 여백: 블러 처리한 가로판 배경 (이음새·이중 태양 문제 회피) */}
-      {wideBgUrl && <div className="side-fill" style={{ backgroundImage: `url(${wideBgUrl})` }} />}
       <div className="stage">
         <canvas ref={canvasRef} className="game-canvas" />
 

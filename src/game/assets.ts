@@ -52,7 +52,7 @@ export function getItemImageUrl(id: string): string | null {
 }
 
 /** 캔버스에 그릴 수 있는 장면 이미지 (background, crane 등) */
-export function getSceneImage(name: 'background' | 'crane'): HTMLImageElement | null {
+export function getSceneImage(name: 'background' | 'background-wide' | 'crane'): HTMLImageElement | null {
   return ready(sceneImages.get(name));
 }
 

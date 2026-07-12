@@ -32,25 +32,10 @@ body,
   font-family: -apple-system, 'Apple SD Gothic Neo', sans-serif;
 }
 
-/* 스테이지 좌우 여백 채움 — 블러로 게임 영역과의 이음새를 지운다 */
-.side-fill {
-  position: absolute;
-  inset: 0;
-  background-size: cover;
-  background-position: center;
-  filter: blur(16px) brightness(0.92);
-  /* 블러 가장자리 번짐 숨김 */
-  transform: scale(1.08);
-}
-
-.stage {
-  z-index: 1;
-}
-
 .stage {
   position: relative;
-  /* 폭은 게임 비율(400:720)까지만, 높이는 화면 전체 — 세로 여분은 배경 블리드로 채움 */
-  width: min(100vw, calc(100dvh * 400 / 720));
+  /* 화면 전체 — 게임 월드(400×720)는 캔버스가 중앙에 그리고 여분은 배경 블리드 */
+  width: 100vw;
   height: 100dvh;
   overflow: hidden;
   /* HUD 크기를 스테이지 폭 기준으로 조절 (cqw) — 태블릿에서 너무 작아지지 않게 */
