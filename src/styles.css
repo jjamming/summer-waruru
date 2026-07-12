@@ -137,7 +137,8 @@ body,
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: calc(var(--safe-top) + 34px) 24px max(20px, env(safe-area-inset-bottom));
+  /* 하단 여백: 바닥에서 화면의 6% 띄워 엄지 존 안에서 여유 확보 */
+  padding: calc(var(--safe-top) + 34px) 24px calc(6dvh + env(safe-area-inset-bottom, 0px));
   /* hero 이미지가 있으면 inline style로 덮어씀 (cover 풀블리드) */
   background: linear-gradient(180deg, #7ec8f2 0%, #c9ecfa 62%, #f2dfae 100%);
   background-size: cover;
