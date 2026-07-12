@@ -226,7 +226,7 @@ body,
   box-shadow: 0 2px 8px rgba(0, 40, 80, 0.12);
 }
 
-.landing-hearts-row {
+.hearts-row {
   font-size: 24px;
   letter-spacing: 4px;
   display: flex;
@@ -448,6 +448,17 @@ body,
   color: #8b95a1;
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+.modal-hearts {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2px;
+}
+
+.modal-hearts .heart-img {
+  width: 22px;
+  height: 22px;
 }
 
 .modal-refill,

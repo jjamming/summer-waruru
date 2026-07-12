@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import HeartsRow from './HeartsRow';
 import { getItemImageUrl } from '../game/assets';
 import type { ItemDef } from '../game/items';
 import { formatRemaining, nextRefillAt } from '../lib/hearts';
@@ -80,8 +81,12 @@ export default function GameOverModal({
         {nearMiss && <p className="modal-near-miss">최고 기록까지 단 {gapToBest.toLocaleString()}점!</p>}
 
         <div className="modal-actions">
+          {/* 랜딩과 같은 시각 언어로 하트 잔량 표시 — 버튼 라벨은 행동만 */}
+          <div className="modal-hearts">
+            <HeartsRow count={hearts} />
+          </div>
           <button className="btn btn-primary" disabled={!canRetry} onClick={onRetry}>
-            {canRetry ? `다시하기 (❤️ ${hearts})` : '하트가 다 떨어졌어요'}
+            {canRetry ? '다시하기' : '하트가 다 떨어졌어요'}
           </button>
           <button className="btn btn-secondary" onClick={handleShare}>
             공유하기

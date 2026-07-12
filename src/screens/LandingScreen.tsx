@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import HeartsRow from '../components/HeartsRow';
 import TutorialModal from '../components/TutorialModal';
 import { getSceneUrl } from '../game/assets';
 import { MAX_HEARTS, formatRemaining, heartsLeft, nextRefillAt } from '../lib/hearts';
@@ -10,12 +11,6 @@ import { WIDE_LAYOUT_QUERY, useMediaQuery } from '../lib/useMedia';
 
 interface Props {
   onStart: () => void;
-}
-
-function Heart({ filled }: { filled: boolean }) {
-  const url = getSceneUrl(filled ? 'heart-full' : 'heart-empty');
-  if (url) return <img className="heart-img" src={url} alt="" />;
-  return <span className="heart">{filled ? '❤️' : '🤍'}</span>;
 }
 
 export default function LandingScreen({ onStart }: Props) {
@@ -67,11 +62,7 @@ export default function LandingScreen({ onStart }: Props) {
 
       <div className="landing-bottom">
         <div className="landing-hearts">
-          <div className="landing-hearts-row" aria-label={`하트 ${hearts}개 남음`}>
-            {Array.from({ length: MAX_HEARTS }, (_, i) => (
-              <Heart key={i} filled={i < hearts} />
-            ))}
-          </div>
+          <HeartsRow count={hearts} />
           {hearts < MAX_HEARTS && refillAt && (
             <p className="landing-hearts-refill">다음 하트까지 {formatRemaining(refillAt - now)}</p>
           )}
