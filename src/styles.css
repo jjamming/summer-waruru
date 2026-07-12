@@ -58,29 +58,43 @@ body,
   pointer-events: none;
 }
 
-.hud-top {
-  display: flex;
-  justify-content: space-between;
+/* 상단 중앙 대형 점수 — 낙하 시선 경로에 걸리게 (UT: 게임 중 점수 안 보임) */
+.hud-score {
+  text-align: center;
+  animation: score-pop 0.25s ease-out;
 }
 
-.badge {
-  background: rgba(255, 255, 255, 0.92);
-  color: #1b4a7a;
-  font-weight: 800;
-  font-size: clamp(13px, 3.6cqw, 21px);
-  padding: 0.5em 0.85em;
-  border-radius: 0.85em;
-  box-shadow: 0 2px 6px rgba(0, 40, 80, 0.18);
+.score-value {
+  font-size: clamp(30px, 9cqw, 48px);
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.1;
+  text-shadow:
+    0 2px 0 rgba(27, 74, 122, 0.45),
+    0 4px 12px rgba(0, 40, 80, 0.35);
 }
 
-.hud-sub {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-top: 8px;
+.score-best {
+  margin-top: 1px;
+  font-size: clamp(11px, 2.8cqw, 15px);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 1px 3px rgba(0, 40, 80, 0.4);
+}
+
+@keyframes score-pop {
+  0% {
+    transform: scale(1.18);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .next-card {
+  position: absolute;
+  right: 14px;
+  top: calc(var(--safe-top) + 44px);
   background: rgba(255, 255, 255, 0.92);
   border-radius: 12px;
   padding: 6px 12px 7px;
@@ -113,25 +127,6 @@ body,
   font-weight: 700;
   color: #4a5a72;
   letter-spacing: 0.5px;
-}
-
-.life-badge {
-  background: rgba(255, 255, 255, 0.92);
-  border-radius: 0.85em;
-  padding: 0.45em 0.75em;
-  font-size: clamp(13px, 3.4cqw, 20px);
-  font-weight: 800;
-  color: #d33;
-  box-shadow: 0 2px 6px rgba(0, 40, 80, 0.18);
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.life-badge-img {
-  width: 1.2em;
-  height: 1.2em;
-  object-fit: contain;
 }
 
 /* ---------- 랜딩 ---------- */
@@ -225,11 +220,18 @@ body,
   object-fit: contain;
 }
 
-.landing-hearts-refill {
-  margin-top: 4px;
+.landing-hearts-caption {
+  margin-top: 5px;
   font-size: 12px;
   font-weight: 600;
   color: #3a6a96;
+}
+
+.landing-hearts-refill {
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #f4574a;
 }
 
 .landing-cta {

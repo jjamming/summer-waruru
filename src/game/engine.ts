@@ -20,6 +20,13 @@ export interface DroppedItem {
 
 export type GamePhase = 'ready' | 'playing' | 'gameover';
 
+export interface ScoreFloater {
+  x: number;
+  y: number;
+  points: number;
+  at: number;
+}
+
 export interface GameSnapshot {
   phase: GamePhase;
   score: number;
@@ -58,6 +65,8 @@ export class GameEngine {
 
   /** 게임오버 원인 아이템 (연출용) */
   culprit: ItemDef | null = null;
+  /** 착지 득점 플로팅 연출 큐 (renderer 소비) */
+  private floaters: ScoreFloater[] = [];
 
   private accumulatorMs = 0;
 
@@ -103,6 +112,13 @@ export class GameEngine {
         const { min, max } = b.bounds;
         return { x: min.x, y: min.y, w: max.x - min.x, h: max.y - min.y };
       });
+  }
+
+  /** 최근 900ms 내 득점 플로터 (월드 좌표) */
+  get scoreFloaters(): readonly ScoreFloater[] {
+    const now = performance.now();
+    this.floaters = this.floaters.filter((f) => now - f.at < 900);
+    return this.floaters;
   }
 
   get droppedItems(): readonly DroppedItem[] {
@@ -182,6 +198,13 @@ export class GameEngine {
           if (item.settleCount >= C.settleFrames) {
             item.scored = true;
             this.score += item.def.points;
+            // 착지 지점 위로 떠오르는 "+n" 연출용 (renderer가 그림)
+            this.floaters.push({
+              x: item.body.position.x,
+              y: item.body.position.y,
+              points: item.def.points,
+              at: performance.now(),
+            });
             this.events.onScore?.(item.def.points, this.score);
           }
         } else {

@@ -288,6 +288,26 @@ function drawItems(ctx: CanvasRenderingContext2D, items: readonly DroppedItem[])
   }
 }
 
+/** 착지 득점 "+n" — 아이템 위에서 떠오르며 사라진다 (시선이 있는 곳에 피드백) */
+function drawScoreFloaters(ctx: CanvasRenderingContext2D, engine: GameEngine) {
+  const now = performance.now();
+  for (const f of engine.scoreFloaters) {
+    const t = (now - f.at) / 900; // 0~1
+    const alpha = Math.min(t / 0.15, (1 - t) / 0.35, 1);
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, alpha);
+    ctx.font = '900 20px -apple-system, "Apple SD Gothic Neo", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#fff';
+    ctx.strokeStyle = 'rgba(180, 45, 40, 0.9)';
+    ctx.lineWidth = 3;
+    const y = f.y - 34 - t * 26;
+    ctx.strokeText(`+${f.points}`, f.x, y);
+    ctx.fillText(`+${f.points}`, f.x, y);
+    ctx.restore();
+  }
+}
+
 export function render(ctx: CanvasRenderingContext2D, engine: GameEngine, vp: Viewport) {
   ctx.clearRect(0, 0, vp.w, vp.h);
   drawBackground(ctx, vp);
@@ -297,5 +317,6 @@ export function render(ctx: CanvasRenderingContext2D, engine: GameEngine, vp: Vi
   drawPlatforms(ctx, engine);
   drawItems(ctx, engine.droppedItems);
   drawCrane(ctx, engine);
+  drawScoreFloaters(ctx, engine);
   ctx.restore();
 }

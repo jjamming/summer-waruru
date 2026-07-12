@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import GameOverModal from '../components/GameOverModal';
 import TutorialModal from '../components/TutorialModal';
 import { GameEngine, type GameSnapshot } from '../game/engine';
-import { getItemImageUrl, getSceneUrl } from '../game/assets';
+import { getItemImageUrl } from '../game/assets';
 import { render, setupCanvas } from '../game/renderer';
 import { consumeHeart, heartsLeft } from '../lib/hearts';
 import { kvGet, kvSet } from '../lib/kv';
@@ -118,35 +118,24 @@ export default function GameScreen({ onHome }: Props) {
       <div className="stage">
         <canvas ref={canvasRef} className="game-canvas" />
 
-        {/* HUD */}
+        {/* HUD — 점수는 상단 중앙 대형 (낙하 시선 경로에 걸리게), 하트는 게임 중 비노출 */}
         <div className="hud">
-          <div className="hud-top">
-            <div className="badge">점수 {snap?.score.toLocaleString() ?? 0}</div>
-            <div className="badge">최고 기록 {best.toLocaleString()}</div>
+          <div className="hud-score" key={snap?.score ?? 0}>
+            <div className="score-value">{snap?.score.toLocaleString() ?? 0}</div>
+            <div className="score-best">최고 기록 {best.toLocaleString()}</div>
           </div>
-          <div className="hud-sub">
-            <div className="life-badge">
-              {getSceneUrl('heart-full') ? (
-                <img className="life-badge-img" src={getSceneUrl('heart-full')!} alt="하트" />
-              ) : (
-                '❤️'
-              )}{' '}
-              {hearts}
-            </div>
-            {/* 다음 아이템은 최고 기록 아래(우측) */}
-            <div className="next-card">
-              <div className="next-title">다음</div>
-              {snap && (
-                <div className="next-emoji">
-                  {getItemImageUrl(snap.next.id) ? (
-                    <img className="next-img" src={getItemImageUrl(snap.next.id)!} alt="" />
-                  ) : (
-                    snap.next.emoji
-                  )}
-                </div>
-              )}
-              <div className="next-label">{snap?.next.label}</div>
-            </div>
+          <div className="next-card">
+            <div className="next-title">다음</div>
+            {snap && (
+              <div className="next-emoji">
+                {getItemImageUrl(snap.next.id) ? (
+                  <img className="next-img" src={getItemImageUrl(snap.next.id)!} alt="" />
+                ) : (
+                  snap.next.emoji
+                )}
+              </div>
+            )}
+            <div className="next-label">{snap?.next.label}</div>
           </div>
         </div>
 

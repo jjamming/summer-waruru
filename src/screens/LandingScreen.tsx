@@ -63,6 +63,8 @@ export default function LandingScreen({ onStart }: Props) {
       <div className="landing-bottom">
         <div className="landing-hearts">
           <HeartsRow count={hearts} />
+          {/* 하트 = 입장권 규칙을 상시 표기 (UT: 개념 혼동) */}
+          <p className="landing-hearts-caption">게임 1판에 하트 1개 · 24시간 뒤 다시 차올라요</p>
           {hearts < MAX_HEARTS && refillAt && (
             <p className="landing-hearts-refill">다음 하트까지 {formatRemaining(refillAt - now)}</p>
           )}
