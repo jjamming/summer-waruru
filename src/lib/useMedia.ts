@@ -21,8 +21,3 @@ export function useMediaQuery(query: string): boolean {
  */
 export const WIDE_LAYOUT_QUERY = '(min-aspect-ratio: 3/5)';
 
-/** 스마트폰 가로모드 (가로인데 세로가 짧음) → 앱 전체 미지원, 회전 안내 */
-export const PHONE_LANDSCAPE_QUERY = '(orientation: landscape) and (max-height: 500px)';
-
-/** 게임 화면은 기기 불문 세로 전용 — 가로면 일시정지 + 회전 안내 (랜딩은 가로 허용) */
-export const LANDSCAPE_QUERY = '(orientation: landscape)';

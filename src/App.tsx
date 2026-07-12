@@ -1,10 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import RotateOverlay from './components/RotateOverlay';
 import GameScreen from './screens/GameScreen';
 import LandingScreen from './screens/LandingScreen';
 import { consumeHeart } from './lib/hearts';
 import { kvSet } from './lib/kv';
-import { PHONE_LANDSCAPE_QUERY, useMediaQuery } from './lib/useMedia';
 
 export default function App() {
   const [screen, setScreen] = useState<'landing' | 'game'>('landing');
@@ -12,18 +10,15 @@ export default function App() {
   const [gameKey, setGameKey] = useState(0);
   // 출시 가이드: 미니앱 종료 시 확인 모달 노출
   const [exitConfirm, setExitConfirm] = useState(false);
-  // 정책: 스마트폰 가로모드 미지원 (태블릿은 -wide 에셋으로 대응)
-  const phoneLandscape = useMediaQuery(PHONE_LANDSCAPE_QUERY);
 
   const screenRef = useRef(screen);
   screenRef.current = screen;
 
   useEffect(() => {
-    // 토스 앱 안: 세로 고정 + OS 스와이프 뒤로가기 제스처 차단 (출시 가이드)
-    // 밖(로컬 브라우저)에서는 조용히 무시
+    // 토스 앱 안: OS 스와이프 뒤로가기 제스처 차단 (출시 가이드)
+    // 가로/세로 모두 지원하므로 방향 고정은 하지 않는다 — 밖(로컬 브라우저)에서는 조용히 무시
     import('@apps-in-toss/web-framework')
       .then((m) => {
-        m.setDeviceOrientation({ type: 'portrait' }).catch(() => {});
         m.setIosSwipeGestureEnabled({ isEnabled: false }).catch(() => {});
         // env(safe-area-inset-top)이 0인 웹뷰 대비 — 네이티브 인셋을 CSS 변수로 주입
         try {
@@ -101,8 +96,6 @@ export default function App() {
           </div>
         </div>
       )}
-
-      {phoneLandscape && <RotateOverlay />}
     </>
   );
 }

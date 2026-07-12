@@ -861,46 +861,6 @@ body,
   }
 }
 
-/* ---------- 스마트폰 가로모드 안내 (미지원 정책) ---------- */
-
-.rotate-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  /* hero 이미지 + 딤 — 컴포넌트에서 inline style로 주입 (이미지 없으면 폴백 딤) */
-  background-color: rgba(6, 24, 44, 0.85);
-  background-size: cover;
-  background-position: center;
-  color: #fff;
-  font-size: 17px;
-  font-weight: 700;
-  font-family: -apple-system, 'Apple SD Gothic Neo', sans-serif;
-  text-shadow: 0 1px 3px rgba(0, 20, 40, 0.5);
-  padding: 0 24px;
-  text-align: center;
-}
-
-.rotate-emoji {
-  font-size: 44px;
-  animation: rotate-hint 1.6s ease-in-out infinite;
-}
-
-@keyframes rotate-hint {
-  0%,
-  25% {
-    transform: rotate(0deg);
-  }
-  55%,
-  100% {
-    transform: rotate(90deg);
-  }
-}
-
 @keyframes fade-in {
   from {
     opacity: 0;

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import GameOverModal from '../components/GameOverModal';
-import RotateOverlay from '../components/RotateOverlay';
 import TutorialModal from '../components/TutorialModal';
 import { GameEngine, type GameSnapshot } from '../game/engine';
 import { getItemImageUrl, getSceneUrl } from '../game/assets';
@@ -9,7 +8,6 @@ import { consumeHeart, heartsLeft } from '../lib/hearts';
 import { kvGet, kvSet } from '../lib/kv';
 import { hasSeenHowto, markHowtoSeen } from '../lib/howto';
 import { sfx, unlockAudio } from '../lib/sound';
-import { LANDSCAPE_QUERY, useMediaQuery } from '../lib/useMedia';
 
 const BEST_KEY = 'summer-waruru:best';
 
@@ -30,10 +28,8 @@ export default function GameScreen({ onHome }: Props) {
   const [hearts, setHearts] = useState(heartsLeft);
   // 최초 플레이어에겐 게임 화면 위에서 튜토리얼을 먼저 — 닫을 때까지 물리(크레인) 정지
   const [showTutorial, setShowTutorial] = useState(() => !hasSeenHowto());
-  // 게임은 기기 불문 세로 전용 — 가로면 일시정지 + 회전 안내
-  const landscape = useMediaQuery(LANDSCAPE_QUERY);
   const pausedRef = useRef(false);
-  pausedRef.current = showTutorial || landscape;
+  pausedRef.current = showTutorial;
 
   const closeTutorial = useCallback(() => {
     markHowtoSeen();
@@ -61,7 +57,12 @@ export default function GameScreen({ onHome }: Props) {
   useEffect(() => {
     startGame();
     const canvas = canvasRef.current!;
-    const { ctx, vp } = setupCanvas(canvas);
+    let view = setupCanvas(canvas);
+    // 화면 크기·회전 변경 시 뷰포트 재계산 (기기 회전 + 데브툴 디버깅 대응)
+    const onResize = () => {
+      view = setupCanvas(canvas);
+    };
+    window.addEventListener('resize', onResize);
 
     let raf = 0;
     let last = performance.now();
@@ -69,7 +70,7 @@ export default function GameScreen({ onHome }: Props) {
       const engine = engineRef.current;
       if (engine) {
         if (!pausedRef.current) engine.update(now - last);
-        render(ctx, engine, vp);
+        render(view.ctx, engine, view.vp);
         setSnap(engine.snapshot());
       }
       last = now;
@@ -78,6 +79,7 @@ export default function GameScreen({ onHome }: Props) {
     raf = requestAnimationFrame(loop);
     return () => {
       cancelAnimationFrame(raf);
+      window.removeEventListener('resize', onResize);
       engineRef.current?.destroy();
     };
   }, [startGame]);
@@ -148,15 +150,7 @@ export default function GameScreen({ onHome }: Props) {
           </div>
         </div>
 
-        {showTutorial && !landscape && (
-          <TutorialModal onDone={closeTutorial} onClose={closeTutorial} />
-        )}
-
-        {landscape && (
-          <div className="rotate-overlay-game">
-            <RotateOverlay />
-          </div>
-        )}
+        {showTutorial && <TutorialModal onDone={closeTutorial} onClose={closeTutorial} />}
 
         {isGameOver && gameOverVisible && snap && (
           <GameOverModal
