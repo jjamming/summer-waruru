@@ -127,15 +127,23 @@ export default function PhysicsDemo() {
         ctx.restore();
       }
 
-      // 풍덩!
-      if (splash && performance.now() - splash.at < 700) {
+      // 풍덩! — 페이드 인 → 유지 → 떠오르며 페이드 아웃
+      const SPLASH_MS = 900;
+      const elapsed = splash ? performance.now() - splash.at : Infinity;
+      if (splash && elapsed < SPLASH_MS) {
+        const fadeIn = Math.min(elapsed / 150, 1);
+        const fadeOut = Math.min(Math.max((SPLASH_MS - elapsed) / 350, 0), 1);
+        const alpha = Math.min(fadeIn, fadeOut);
+        const rise = (elapsed / SPLASH_MS) * 8; // 살짝 떠오르는 연출
+        ctx.save();
+        ctx.globalAlpha = alpha;
         ctx.font = '900 13px -apple-system, sans-serif';
         ctx.textAlign = 'center';
         ctx.fillStyle = '#fff';
         ctx.shadowColor = 'rgba(0,60,100,0.5)';
         ctx.shadowBlur = 3;
-        ctx.fillText('풍덩!', Math.min(splash.x, W - 24), H - SEA_H - 6);
-        ctx.shadowBlur = 0;
+        ctx.fillText('풍덩!', Math.min(splash.x, W - 24), H - SEA_H - 6 - rise);
+        ctx.restore();
       }
     };
 
