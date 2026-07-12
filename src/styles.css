@@ -211,6 +211,7 @@ body,
   letter-spacing: 4px;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
 }
 
