@@ -228,8 +228,12 @@ body,
   gap: 10px;
 }
 
-/* 다음 하트 회복 카운트다운 칩 */
+/* 다음 하트 회복 카운트다운 칩 — 가장 긴 표기(⏱ 23:59:59) 기준 고정 폭 */
 .heart-timer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 92px;
   font-size: 13px;
   font-weight: 800;
   color: #f4574a;
