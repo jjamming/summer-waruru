@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import HeartsRow from '../components/HeartsRow';
+import HeartsRow, { HeartCost } from '../components/HeartsRow';
+import HeartTimerChip from '../components/HeartTimerChip';
 import TutorialModal from '../components/TutorialModal';
 import { getSceneUrl } from '../game/assets';
-import { MAX_HEARTS, formatRemaining, heartsLeft, nextRefillAt } from '../lib/hearts';
+import { heartsLeft } from '../lib/hearts';
 import soundOffIcon from '../assets/sound-off.svg';
 import soundOnIcon from '../assets/sound-on.svg';
 import { markHowtoSeen } from '../lib/howto';
@@ -31,7 +32,13 @@ export default function LandingScreen({ onStart }: Props) {
   };
 
   const hearts = heartsLeft(now);
-  const refillAt = nextRefillAt(now);
+  // 시작 시 하트 차감 연출 후 게임 진입
+  const [consuming, setConsuming] = useState(false);
+  const handleStart = () => {
+    if (hearts <= 0 || consuming) return;
+    setConsuming(true);
+    setTimeout(onStart, 450);
+  };
   // 넓은 화면(태블릿 가로 등)에선 가로판 히어로 우선, 없으면 세로판 폴백
   const wide = useMediaQuery(WIDE_LAYOUT_QUERY);
   const heroUrl = (wide && getSceneUrl('hero-wide')) || getSceneUrl('hero');
@@ -62,17 +69,21 @@ export default function LandingScreen({ onStart }: Props) {
 
       <div className="landing-bottom">
         <div className="landing-hearts">
-          <HeartsRow count={hearts} />
-          {/* 하트 = 입장권 규칙을 상시 표기 (UT: 개념 혼동) */}
-          <p className="landing-hearts-caption">게임 1판에 하트 1개 · 24시간 뒤 다시 차올라요</p>
-          {hearts < MAX_HEARTS && refillAt && (
-            <p className="landing-hearts-refill">다음 하트까지 {formatRemaining(refillAt - now)}</p>
-          )}
+          <div className="landing-hearts-line">
+            <HeartsRow count={hearts} consuming={consuming} />
+            <HeartTimerChip />
+          </div>
         </div>
 
         <div className="landing-cta">
-          <button className="btn btn-primary btn-xl" disabled={hearts <= 0} onClick={onStart}>
-            {hearts > 0 ? '게임 시작' : '하트가 다 떨어졌어요'}
+          <button className="btn btn-primary btn-xl" disabled={hearts <= 0} onClick={handleStart}>
+            {hearts > 0 ? (
+              <>
+                게임 시작 <HeartCost />
+              </>
+            ) : (
+              '하트가 다 떨어졌어요'
+            )}
           </button>
           <button className="btn btn-ghost" onClick={() => setTutorial(true)}>
             게임 방법

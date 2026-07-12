@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import HeartsRow from './HeartsRow';
+import HeartsRow, { HeartCost } from './HeartsRow';
+import HeartTimerChip from './HeartTimerChip';
 import { getItemImageUrl } from '../game/assets';
 import type { ItemDef } from '../game/items';
-import { formatRemaining, nextRefillAt } from '../lib/hearts';
+
 import { shareScore } from '../lib/share';
 
 interface Props {
@@ -36,8 +37,15 @@ export default function GameOverModal({
   onHome,
 }: Props) {
   const [shareNote, setShareNote] = useState<string | null>(null);
+  // 다시하기 시 하트 차감 연출 후 재시작
+  const [consuming, setConsuming] = useState(false);
   const canRetry = hearts > 0;
-  const refillAt = nextRefillAt();
+
+  const handleRetry = () => {
+    if (!canRetry || consuming) return;
+    setConsuming(true);
+    setTimeout(onRetry, 450);
+  };
 
   // "아까웠다" 프레이밍: 최고 기록의 80% 이상으로 아쉽게 못 미쳤을 때
   const gapToBest = best - score;
@@ -83,17 +91,21 @@ export default function GameOverModal({
         <div className="modal-actions">
           {/* 랜딩과 같은 시각 언어로 하트 잔량 표시 — 버튼 라벨은 행동만 */}
           <div className="modal-hearts">
-            <HeartsRow count={hearts} />
+            <HeartsRow count={hearts} consuming={consuming} />
+            <HeartTimerChip />
           </div>
-          <button className="btn btn-primary" disabled={!canRetry} onClick={onRetry}>
-            {canRetry ? '다시하기' : '하트가 다 떨어졌어요'}
+          <button className="btn btn-primary" disabled={!canRetry} onClick={handleRetry}>
+            {canRetry ? (
+              <>
+                다시하기 <HeartCost />
+              </>
+            ) : (
+              '하트가 다 떨어졌어요'
+            )}
           </button>
           <button className="btn btn-secondary" onClick={handleShare}>
             공유하기
           </button>
-          {!canRetry && refillAt && (
-            <p className="modal-refill">다음 하트까지 {formatRemaining(refillAt - Date.now())}</p>
-          )}
           {shareNote && <p className="modal-share-note">{shareNote}</p>}
           <button className="text-link" onClick={onHome}>
             처음 화면으로
