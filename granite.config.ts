@@ -21,6 +21,11 @@ export default defineConfig({
   webViewProps: {
     type: 'game',
   },
+  // 내비바 투명 배경 — 웹뷰가 상태바(다이나믹 아일랜드)까지 풀스크린으로 확장됨.
+  // 없으면 iOS에서 상단이 흰 띠로 분리됨 (커뮤니티 #4200 운영진 답변)
+  navigationBar: {
+    transparentBackground: true,
+  },
   permissions: [],
   outdir: 'dist',
 });
