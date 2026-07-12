@@ -132,50 +132,48 @@ function edgeColors(img: HTMLImageElement): { top: string; bottom: string } {
   return colors;
 }
 
-/** 배경 물결선의 월드 y — 세로판 배경의 실측값 기준 (이미지 교체 시 재측정) */
+/** 배경 물결선의 월드 y — 세로판 배경 실측 기준 (이미지 교체 시 재측정: 세션 로그 참고) */
 const WATERLINE_WORLD_Y = 599;
-/** 가로판 배경에서 물결선의 세로 위치 비율 (실측) */
+/** 세로판/가로판 배경에서 물결선의 세로 위치 비율 (실측) */
+const PORTRAIT_WATERLINE_FRAC = 0.753;
 const WIDE_WATERLINE_FRAC = 0.793;
 
-function drawBackground(ctx: CanvasRenderingContext2D, vp: Viewport) {
-  // 넓은 화면: 가로판 이미지 한 장을 물결선 기준으로 월드에 정렬 (딤·블러 없이 자연스럽게)
-  const wideBg = vp.w > C.width + 2 ? getSceneImage('background-wide') : null;
-  if (wideBg) {
-    const edge = edgeColors(wideBg);
-    const waterY = vp.top + WATERLINE_WORLD_Y;
-    ctx.fillStyle = edge.top;
-    ctx.fillRect(0, 0, vp.w, waterY);
-    ctx.fillStyle = edge.bottom;
-    ctx.fillRect(0, waterY, vp.w, vp.h - waterY);
+/** 이미지를 폭 커버 + 물결선 기준으로 월드에 정렬해 그린다 */
+function drawWaterlineAligned(
+  ctx: CanvasRenderingContext2D,
+  img: HTMLImageElement,
+  vp: Viewport,
+  waterlineFrac: number,
+) {
+  // 백스톱: 이미지가 못 덮는 영역(초장신 기기 등)은 가장자리 색으로 이어진다
+  const edge = edgeColors(img);
+  const waterY = vp.top + WATERLINE_WORLD_Y;
+  ctx.fillStyle = edge.top;
+  ctx.fillRect(0, 0, vp.w, waterY);
+  ctx.fillStyle = edge.bottom;
+  ctx.fillRect(0, waterY, vp.w, vp.h - waterY);
 
-    // 세 가지 커버 조건을 만족하는 최소 스케일:
-    // ① 물결선 위로 캔버스 상단까지 ② 물결선 아래로 캔버스 하단까지 ③ 좌우 폭
-    const aspect = wideBg.naturalWidth / wideBg.naturalHeight;
-    const dh = Math.max(
-      waterY / WIDE_WATERLINE_FRAC,
-      (vp.h - waterY) / (1 - WIDE_WATERLINE_FRAC),
-      vp.w / aspect,
-    );
-    const dw = dh * aspect;
-    ctx.drawImage(wideBg, (vp.w - dw) / 2, waterY - WIDE_WATERLINE_FRAC * dh, dw, dh);
+  const dw = vp.w;
+  const dh = dw * (img.naturalHeight / img.naturalWidth);
+  ctx.drawImage(img, 0, waterY - waterlineFrac * dh, dw, dh);
+}
+
+function drawBackground(ctx: CanvasRenderingContext2D, vp: Viewport) {
+  const portrait = getSceneImage('background');
+  const wide = getSceneImage('background-wide');
+
+  // 세로형 화면(비율 ≤ 1): 세로판 — 태양·야자수가 화면 안에 들어오는 구도.
+  // 가로형 화면: 가로판. 각각 폭 커버 + 물결선 정렬로 크롭/스케일 대응.
+  if (vp.w <= vp.h && portrait) {
+    drawWaterlineAligned(ctx, portrait, vp, PORTRAIT_WATERLINE_FRAC);
     return;
   }
-
-  const bg = getSceneImage('background');
-  if (bg) {
-    // 백스톱: 이미지 블리드가 화면보다 짧아도(초장신 기기) 가장자리 색으로 이어진다
-    const edge = edgeColors(bg);
-    ctx.fillStyle = edge.top;
-    ctx.fillRect(0, 0, vp.w, vp.top + C.voidY);
-    ctx.fillStyle = edge.bottom;
-    ctx.fillRect(0, vp.top + C.voidY, vp.w, vp.h - vp.top - C.voidY);
-
-    // 이미지의 원본 9:16 프레임(세로 중앙 가정)을 게임 월드(400×720)에 정렬해
-    // 확장분(블리드)이 월드 위아래로 자연스럽게 삐져나오게 그린다.
-    // 구형 9:16 이미지도 dh === C.height로 동일하게 동작.
-    const scale = C.width / bg.naturalWidth;
-    const dh = bg.naturalHeight * scale;
-    ctx.drawImage(bg, vp.left, vp.top + (C.height - dh) / 2, C.width, dh);
+  if (vp.w > vp.h && wide) {
+    drawWaterlineAligned(ctx, wide, vp, WIDE_WATERLINE_FRAC);
+    return;
+  }
+  if (portrait) {
+    drawWaterlineAligned(ctx, portrait, vp, PORTRAIT_WATERLINE_FRAC);
     return;
   }
 
