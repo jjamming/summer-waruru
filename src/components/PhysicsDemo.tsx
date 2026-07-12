@@ -16,12 +16,12 @@ const PLANK_BOTTOM = 26; // css 데모(.demo-plank)와 동일 배치
 const SCALE = 0.75;
 const CYCLE_MS = 4200;
 
-/** 살짝 어긋나게 쌓아 매 사이클 같은 모양으로 자연 붕괴를 유도 */
+/** 판 가장자리 쪽으로 어긋나게 쌓아 무너지면 실제로 바다로 떨어지게 유도 */
 const STACK: { id: string; offsetX: number }[] = [
-  { id: 'watermelon-slice', offsetX: 0 },
-  { id: 'strawberry', offsetX: 5 },
-  { id: 'patbingsu', offsetX: -7 },
-  { id: 'tube', offsetX: 13 },
+  { id: 'watermelon-slice', offsetX: 8 },
+  { id: 'strawberry', offsetX: 18 },
+  { id: 'patbingsu', offsetX: 6 },
+  { id: 'tube', offsetX: 28 },
 ];
 
 function sizeOf(def: ItemDef): { w: number; h: number } {
@@ -51,7 +51,7 @@ export default function PhysicsDemo() {
     const engine = Matter.Engine.create();
     engine.gravity.y = 0.9;
 
-    const plankW = W * 0.42;
+    const plankW = W * 0.3;
     const plankTopY = H - PLANK_BOTTOM - PLANK_H;
     Matter.Composite.add(
       engine.world,
@@ -64,12 +64,14 @@ export default function PhysicsDemo() {
     let items: { body: Matter.Body; def: ItemDef }[] = [];
     let splash: { x: number; at: number } | null = null;
     let cycleStart = 0;
+    let nudged = false;
 
     const spawnStack = (now: number) => {
       for (const it of items) Matter.Composite.remove(engine.world, it.body);
       items = [];
       splash = null;
       cycleStart = now;
+      nudged = false;
       let y = plankTopY;
       for (const { id, offsetX } of STACK) {
         const def = itemById(id);
@@ -151,6 +153,17 @@ export default function PhysicsDemo() {
       // 바다 입수 감지 → 풍덩
       for (const { body } of items) {
         if (!splash && body.position.y > H - SEA_H) splash = { x: body.position.x, at: now };
+      }
+
+      // 붕괴 후에도 판에 남은 아이템은 밀려 떨어지게 — "전부 바다로" 결말 보장
+      if (!nudged && now - cycleStart > 1400) {
+        nudged = true;
+        for (const { body } of items) {
+          if (body.position.y < plankTopY + 4) {
+            Matter.Body.setVelocity(body, { x: 3.2, y: -1.2 });
+            Matter.Body.setAngularVelocity(body, 0.12);
+          }
+        }
       }
 
       if (now - cycleStart > CYCLE_MS) spawnStack(now);

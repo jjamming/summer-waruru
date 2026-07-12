@@ -68,8 +68,8 @@ export default function TutorialModal({ onDone, onClose }: Props) {
       demo: (
         <div className="demo demo-stack">
           {slice ? <img className="demo-stack-1" src={slice} alt="" /> : <span className="demo-stack-1 demo-fallback">🍉</span>}
-          {patbingsu ? <img className="demo-stack-2" src={patbingsu} alt="" /> : <span className="demo-stack-2 demo-fallback">🍧</span>}
-          {tube ? <img className="demo-stack-3" src={tube} alt="" /> : <span className="demo-stack-3 demo-fallback">🛟</span>}
+          {tube ? <img className="demo-stack-2" src={tube} alt="" /> : <span className="demo-stack-2 demo-fallback">🛟</span>}
+          {patbingsu ? <img className="demo-stack-3" src={patbingsu} alt="" /> : <span className="demo-stack-3 demo-fallback">🍧</span>}
           <div className="demo-score">+25 +20 +15</div>
           <div className="demo-plank" />
           <div className="demo-sea" />

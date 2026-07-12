@@ -758,18 +758,19 @@ body,
   animation: demo-stack-pop-1 2.4s ease-out infinite;
 }
 
+/* 납작한 튜브가 중간, 키 큰 팥빙수가 맨 위 — 마지막 착지가 또렷하게 보이도록 */
 .demo-stack-2 {
-  width: 32px;
-  left: calc(50% - 16px);
-  bottom: 62px;
+  width: 38px;
+  left: calc(50% - 19px);
+  bottom: 64px;
   opacity: 0;
   animation: demo-stack-pop-2 2.4s ease-out infinite;
 }
 
 .demo-stack-3 {
-  width: 34px;
-  left: calc(50% - 17px);
-  bottom: 88px;
+  width: 30px;
+  left: calc(50% - 15px);
+  bottom: 79px;
   opacity: 0;
   animation: demo-stack-pop-3 2.4s ease-out infinite;
 }
