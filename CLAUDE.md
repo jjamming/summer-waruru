@@ -24,16 +24,19 @@
 
 ## 문서 규칙 (중요)
 
-작업 히스토리·결정·TODO는 `docs/`에 축적한다.
+작업 히스토리·결정·TODO는 `docs/`에 축적한다. `docs/`는 Obsidian 볼트로 관리 — 결정은 위키링크·태그·백링크로 연결된다.
 사용자가 **"문서 갱신해줘"**라고 하면:
-1. `docs/sessions/YYYY-MM-DD.md`에 이번 세션 작업 내역·사용자 피드백 기록 (같은 날 파일 있으면 이어서)
-2. 새 설계 결정이 있으면 `docs/decisions.md`에 결정+이유 추가
+1. `docs/sessions/YYYY-MM-DD.md`에 이번 세션 작업 내역·사용자 피드백 기록 (같은 날 파일 있으면 이어서). 관련 결정은 `[[NNNN-slug]]`로 링크.
+2. 새 설계 결정이 있으면 `docs/decisions/`에 **ADR 노트 1개 = 파일 1개**로 추가 (다음 번호, `NNNN-슬러그.md`):
+   - frontmatter: `status: accepted`, `date`, `tags: [domain/xxx]` (경계 겹치면 복수 태그).
+   - **기존 결정을 뒤집을 땐 그 파일을 지우지 말고** `status: superseded` + `superseded-by: "[[새 노트]]"`로 표시, 새 노트에 `supersedes: "[[옛 노트]]"`.
+   - `docs/decisions/_MOC.md` 인덱스에 도메인 섹션 링크 추가.
 3. `docs/todo.md` 갱신 (완료 체크, 새 항목 추가)
 
 세션 시작 시 `docs/todo.md`와 최근 세션 로그를 먼저 읽고 맥락을 이어갈 것.
 
 ## 컨벤션
 
-- 스타일: 바닐라 CSS (`src/styles.css`) — Tailwind/emotion 도입하지 않음 (2026-07-10 결정, docs/decisions.md 참고)
+- 스타일: 바닐라 CSS (`src/styles.css`) — Tailwind/emotion 도입하지 않음 (2026-07-10 결정, `docs/decisions/0008-custom-buttons.md` 참고)
 - 밸런싱 수치는 코드에 흩뿌리지 말고 `config.ts`/`items.ts`에만
 - 게임 로직에 React 의존성 넣지 않기 (엔진은 순수 TS 유지)
