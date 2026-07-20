@@ -160,6 +160,19 @@ export const ITEMS: ItemDef[] = [
     restitution: 0.08,
     weight: 8,
   },
+  {
+    id: 'duck',
+    // 앱 아이콘 마스코트. 바닥은 평평해 잘 앉지만 머리 쪽이 불룩해 위에 쌓기는 중간 난이도
+    label: '오리',
+    emoji: '🦆',
+    shape: { kind: 'box', width: 32, height: 30 },
+    points: 25,
+    density: 0.001, // 속 빈 고무 장난감이지만 튜브(0.0009)보다 살짝 묵직하게
+    friction: 0.65,
+    restitution: 0.07, // 고무 반발감, 튜닝된 저반발 월드 기준 중상
+    weight: 10,
+    comOffsetY: 4, // 오뚝이처럼 아래가 무거운 장난감 — 살짝 하향
+  },
 ];
 
 export function itemById(id: string): ItemDef {
