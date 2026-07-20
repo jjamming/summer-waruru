@@ -5,8 +5,8 @@ export default defineConfig({
   brand: {
     displayName: '여름와르르',
     primaryColor: '#4AB3E8',
-    // TODO: 배포 전 실제 아이콘 이미지 주소로 교체 (null이면 ait build 검증 실패)
-    icon: 'https://placehold.co/512x512/4AB3E8/ffffff.png?text=W',
+    // 앱 아이콘 — GitHub Pages(개인정보처리방침 레포)에 호스팅. 원본은 src/assets/app-icon/
+    icon: 'https://jjamming.github.io/summer-waruru-privacy/icon-512.png',
   },
   web: {
     host: 'localhost',
