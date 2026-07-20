@@ -156,10 +156,10 @@ export class GameEngine {
     if (m) return m.h / 2 + m.centroidY + 2;
     switch (def.shape.kind) {
       case 'circle':
-        return def.shape.radius + 2;
+        return def.shape.radius * C.itemScale + 2;
       case 'box':
       case 'capsule':
-        return def.shape.height / 2 + 2;
+        return (def.shape.height * C.itemScale) / 2 + 2;
     }
   }
 

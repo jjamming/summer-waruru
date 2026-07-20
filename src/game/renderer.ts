@@ -4,7 +4,7 @@
  */
 
 import { getItemImage, getSceneImage } from './assets';
-import { spriteMetrics } from './bodies';
+import { spriteMetrics, spriteWidth } from './bodies';
 import { GAME_CONFIG as C } from './config';
 import type { GameEngine, DroppedItem } from './engine';
 import type { ItemDef } from './items';
@@ -53,16 +53,8 @@ export function setupCanvas(canvas: HTMLCanvasElement): {
   };
 }
 
-function emojiFontSize(def: ItemDef): number {
-  switch (def.shape.kind) {
-    case 'circle':
-      return def.shape.radius * 2.1;
-    case 'box':
-      return Math.max(def.shape.width, def.shape.height) * 1.15;
-    case 'capsule':
-      return def.shape.width * 0.95;
-  }
-}
+// 이모지 폴백 크기 = 스프라이트 렌더 폭 (bodies.ts 단일 공식 — itemScale 포함)
+const emojiFontSize = spriteWidth;
 
 function drawEmoji(
   ctx: CanvasRenderingContext2D,

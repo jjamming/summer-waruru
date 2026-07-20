@@ -22,15 +22,15 @@ interface HitboxData {
 
 const HITBOXES = rawHitboxes as unknown as Record<string, HitboxData>;
 
-/** 아이템의 화면 렌더 폭 (물리 shape 크기에서 유도 — 밸런싱 수치 유지) */
+/** 아이템의 화면 렌더 폭 (물리 shape 크기에서 유도 — 밸런싱 수치 유지, itemScale 전역 배율 포함) */
 export function spriteWidth(def: ItemDef): number {
   switch (def.shape.kind) {
     case 'circle':
-      return def.shape.radius * 2.1;
+      return def.shape.radius * 2.1 * C.itemScale;
     case 'box':
-      return Math.max(def.shape.width, def.shape.height) * 1.15;
+      return Math.max(def.shape.width, def.shape.height) * 1.15 * C.itemScale;
     case 'capsule':
-      return def.shape.width * 0.95;
+      return def.shape.width * 0.95 * C.itemScale;
   }
 }
 
@@ -70,12 +70,12 @@ export function spriteMetrics(def: ItemDef): SpriteMetrics | null {
   const w = spriteWidth(def);
   const h = w * hb.aspect;
   const c = polygonCentroid(hb.verts);
-  // comOffsetY로 무게중심을 옮기면 바디 원점도 함께 이동 — 렌더 보정에 포함
+  // comOffsetY로 무게중심을 옮기면 바디 원점도 함께 이동 — 렌더 보정에 포함 (itemScale 동일 적용)
   const m: SpriteMetrics = {
     w,
     h,
     centroidX: c.x * w,
-    centroidY: c.y * h + (def.comOffsetY ?? 0),
+    centroidY: c.y * h + (def.comOffsetY ?? 0) * C.itemScale,
   };
   metricsCache.set(def.id, m);
   return m;
@@ -106,20 +106,21 @@ export function createItemBody(def: ItemDef, x: number, y: number, scale = 1): M
     const body = Matter.Bodies.fromVertices(x, y, [verts], opts);
     if (def.comOffsetY) {
       // 무게중심을 아래로 — 위가 무거운 아이템(팥빙수 등)이 덜 넘어지게
-      Matter.Body.setCentre(body, { x: 0, y: def.comOffsetY * scale }, true);
+      Matter.Body.setCentre(body, { x: 0, y: def.comOffsetY * scale * C.itemScale }, true);
     }
     return body;
   }
 
+  const s = scale * C.itemScale;
   switch (def.shape.kind) {
     case 'circle':
-      return Matter.Bodies.circle(x, y, def.shape.radius * scale, opts);
+      return Matter.Bodies.circle(x, y, def.shape.radius * s, opts);
     case 'box':
-      return Matter.Bodies.rectangle(x, y, def.shape.width * scale, def.shape.height * scale, opts);
+      return Matter.Bodies.rectangle(x, y, def.shape.width * s, def.shape.height * s, opts);
     case 'capsule':
-      return Matter.Bodies.rectangle(x, y, def.shape.width * scale, def.shape.height * scale, {
+      return Matter.Bodies.rectangle(x, y, def.shape.width * s, def.shape.height * s, {
         ...opts,
-        chamfer: { radius: (def.shape.height * scale) / 2 - 1 },
+        chamfer: { radius: (def.shape.height * s) / 2 - 1 },
       });
   }
 }

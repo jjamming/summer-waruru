@@ -17,12 +17,15 @@ export const GAME_CONFIG = {
   platformY: 560,
   platformThickness: 14,
 
+  /** 아이템 전역 크기 배율 — 물리·렌더 공통 (items.ts shape 치수에 곱해짐) */
+  itemScale: 1.12,
+
   /** 크레인 이동 영역 (좌우 마진) */
   craneMargin: 44,
   /** 크레인 y 좌표 (아이템이 매달리는 높이) — HUD(점수/최고기록) 아래 */
   craneY: 158,
   /** 크레인 기본 속도 (논리px/초) */
-  craneBaseSpeed: 150,
+  craneBaseSpeed: 130,
   /** 투하 횟수당 크레인 속도 증가율 (난이도 램프) */
   craneSpeedRampPerDrop: 0.045,
   /** 크레인 최고 속도 배율 */
