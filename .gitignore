@@ -5,3 +5,7 @@ dist
 *.ait
 .DS_Store
 .omc/
+
+# Android Studio IDE / 릴리스 빌드 산출물
+android/.idea/
+android/app/release/
