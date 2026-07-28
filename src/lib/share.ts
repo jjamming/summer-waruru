@@ -16,7 +16,7 @@ const DEEP_LINK = 'intoss://summer-waruru';
  * OG 썸네일 URL (1200×600). 아직 미제작 — 호스팅 후 여기에 URL을 넣으면 링크에 썸네일이 붙는다.
  * 빈 문자열이면 콘솔 마케팅 > OG 이미지에 등록한 전역 기본값이 사용된다(등록돼 있을 때).
  */
-const OG_IMAGE_URL = '';
+const OG_IMAGE_URL = 'https://jjamming.github.io/summer-waruru-privacy/og.png';
 
 export async function shareScore(score: number): Promise<ShareResult> {
   const text = `🍉 여름 와르르에서 ${score.toLocaleString()}점을 쌓았어요! 토스에서 도전해 보세요.`;
