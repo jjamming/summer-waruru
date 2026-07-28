@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import soundIcon from '../assets/sound-pause.svg';
+import vibrationIcon from '../assets/vibration.svg';
 import GameOverModal from '../components/GameOverModal';
 import TutorialModal from '../components/TutorialModal';
 import { HeartCost } from '../components/HeartsRow';
@@ -209,37 +211,51 @@ export default function GameScreen({ onHome }: Props) {
         {paused && (
           // 캔버스 탭과 분리 — 모달 안 터치는 게임에 전달하지 않는다
           <div className="modal-dim" onPointerDown={(e) => e.stopPropagation()}>
-            <div className="modal-card">
-              <h2 className="modal-title">일시정지</h2>
-              <div className="modal-actions">
-                <button className="pause-toggle" onClick={toggleSound}>
-                  <span>효과음</span>
-                  <span className={`pause-toggle-state ${soundOn ? 'on' : ''}`}>
-                    {soundOn ? '켜짐' : '꺼짐'}
-                  </span>
-                </button>
-                <button className="pause-toggle" onClick={toggleHaptic}>
-                  <span>진동</span>
-                  <span className={`pause-toggle-state ${hapticOn ? 'on' : ''}`}>
-                    {hapticOn ? '켜짐' : '꺼짐'}
-                  </span>
-                </button>
-                <button className="btn btn-primary" onClick={resumeWithCountdown}>
-                  계속하기
-                </button>
-                <button className="btn btn-secondary" disabled={hearts <= 0} onClick={restartFromPause}>
-                  {hearts > 0 ? (
-                    <>
-                      다시하기 <HeartCost />
-                    </>
-                  ) : (
-                    '하트가 없어요'
-                  )}
-                </button>
-                <button className="text-link" onClick={onHome}>
-                  처음 화면으로
-                </button>
+            <div className="pause-wrap">
+              {/* 나무 현판 보드 — 판자와 같은 우드 톤 */}
+              <div className="pause-board">
+                <div className="pause-plaque">일시정지</div>
+                <div className="pause-panel">
+                  <div className="pause-icon-row">
+                    <button
+                      className={`pause-icon-btn${soundOn ? '' : ' off'}`}
+                      onClick={toggleSound}
+                      aria-label={soundOn ? '효과음 끄기' : '효과음 켜기'}
+                    >
+                      <span className="pause-icon-face">
+                        <img className="pause-icon-img" src={soundIcon} alt="" />
+                      </span>
+                      <span className="pause-icon-label">효과음</span>
+                    </button>
+                    <button
+                      className={`pause-icon-btn${hapticOn ? '' : ' off'}`}
+                      onClick={toggleHaptic}
+                      aria-label={hapticOn ? '진동 끄기' : '진동 켜기'}
+                    >
+                      <span className="pause-icon-face">
+                        <img className="pause-icon-img" src={vibrationIcon} alt="" />
+                      </span>
+                      <span className="pause-icon-label">진동</span>
+                    </button>
+                  </div>
+                  <button className="pause-restart" disabled={hearts <= 0} onClick={restartFromPause}>
+                    {hearts > 0 ? (
+                      <>
+                        다시하기 <HeartCost />
+                      </>
+                    ) : (
+                      '하트가 없어요'
+                    )}
+                  </button>
+                  <button className="text-link" onClick={onHome}>
+                    처음 화면으로
+                  </button>
+                </div>
               </div>
+              {/* 보드 아래 매달린 X = 닫기(계속하기) */}
+              <button className="pause-close" onClick={resumeWithCountdown} aria-label="계속하기">
+                ✕
+              </button>
             </div>
           </div>
         )}
