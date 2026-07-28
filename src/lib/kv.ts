@@ -16,6 +16,7 @@ const MIRROR_KEYS = [
   'summer-waruru:best',
   'summer-waruru:howto-seen:v1',
   'summer-waruru:sound',
+  'summer-waruru:haptic',
   'summer-waruru:user-key',
 ];
 
