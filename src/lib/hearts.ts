@@ -41,6 +41,20 @@ export function consumeHeart(now = Date.now()): boolean {
   return true;
 }
 
+/**
+ * 하트 1개 회복 (공유 리워드용). 남은 사용기록 중 가장 최근(Math.max) 것을 지운다
+ * — 임박한 자연 회복 타이머를 보존해 플레이어에 유리. 이미 가득(5개)이면 no-op.
+ * 새 잔량을 반환.
+ */
+export function grantHeart(now = Date.now()): number {
+  const usedAt = loadUsedAt(now);
+  if (usedAt.length === 0) return MAX_HEARTS; // 이미 5개 — 지급할 자리 없음
+  const latest = Math.max(...usedAt);
+  usedAt.splice(usedAt.indexOf(latest), 1);
+  save(usedAt);
+  return MAX_HEARTS - usedAt.length;
+}
+
 /** 가장 이른 하트 회복 시각 (전부 차 있으면 null) */
 export function nextRefillAt(now = Date.now()): number | null {
   const usedAt = loadUsedAt(now);

@@ -5,6 +5,7 @@ import { getItemImageUrl } from '../game/assets';
 import type { ItemDef } from '../game/items';
 
 import { shareScore } from '../lib/share';
+import { inviteForHearts, isHeartRewardEnabled } from '../lib/reward';
 
 interface Props {
   score: number;
@@ -17,6 +18,8 @@ interface Props {
   hearts: number;
   onRetry: () => void;
   onHome: () => void;
+  /** 공유 리워드로 하트가 지급됐을 때 새 잔량 전달 */
+  onHeartsChange: (heartsLeft: number) => void;
 }
 
 /** '수박이' / '튜브가' — 받침 유무로 주격 조사 선택 */
@@ -35,11 +38,23 @@ export default function GameOverModal({
   hearts,
   onRetry,
   onHome,
+  onHeartsChange,
 }: Props) {
   const [shareNote, setShareNote] = useState<string | null>(null);
   // 다시하기 시 하트 차감 연출 후 재시작
   const [consuming, setConsuming] = useState(false);
   const canRetry = hearts > 0;
+  // 하트가 0이고 공유 리워드가 켜져 있을 때만 초대 CTA 노출 (강제 유도 금지)
+  const canInvite = hearts <= 0 && isHeartRewardEnabled();
+
+  const handleInvite = () => {
+    inviteForHearts({
+      onGranted: (left) => {
+        onHeartsChange(left);
+        setShareNote('하트를 받았어요!');
+      },
+    });
+  };
 
   const handleRetry = () => {
     if (!canRetry || consuming) return;
@@ -94,15 +109,19 @@ export default function GameOverModal({
             <HeartsRow count={hearts} consuming={consuming} />
             <HeartTimerChip />
           </div>
-          <button className="btn btn-primary" disabled={!canRetry} onClick={handleRetry}>
-            {canRetry ? (
-              <>
-                다시하기 <HeartCost />
-              </>
-            ) : (
-              '하트가 다 떨어졌어요'
-            )}
-          </button>
+          {canRetry ? (
+            <button className="btn btn-primary" onClick={handleRetry}>
+              다시하기 <HeartCost />
+            </button>
+          ) : canInvite ? (
+            <button className="btn btn-primary" onClick={handleInvite}>
+              친구에게 공유하고 하트 받기
+            </button>
+          ) : (
+            <button className="btn btn-primary" disabled>
+              하트가 다 떨어졌어요
+            </button>
+          )}
           <button className="btn btn-secondary" onClick={handleShare}>
             공유하기
           </button>

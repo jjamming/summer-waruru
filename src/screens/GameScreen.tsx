@@ -151,6 +151,7 @@ export default function GameScreen({ onHome }: Props) {
             hearts={hearts}
             onRetry={handleRetry}
             onHome={onHome}
+            onHeartsChange={setHearts}
           />
         )}
       </div>
