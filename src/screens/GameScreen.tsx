@@ -220,12 +220,12 @@ export default function GameScreen({ onHome }: Props) {
                     <button
                       className={`pause-icon-btn${soundOn ? '' : ' off'}`}
                       onClick={toggleSound}
-                      aria-label={soundOn ? '효과음 끄기' : '효과음 켜기'}
+                      aria-label={soundOn ? '소리 끄기' : '소리 켜기'}
                     >
                       <span className="pause-icon-face">
                         <img className="pause-icon-img" src={soundIcon} alt="" />
                       </span>
-                      <span className="pause-icon-label">효과음</span>
+                      <span className="pause-icon-label">소리</span>
                     </button>
                     <button
                       className={`pause-icon-btn${hapticOn ? '' : ' off'}`}

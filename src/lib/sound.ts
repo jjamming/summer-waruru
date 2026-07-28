@@ -1,8 +1,10 @@
 /**
- * 효과음 — Web Audio로 합성 (외부 음원 파일 없음, 용량 0).
- * 출시 체크리스트 1번: On/Off 설정 제공, 백그라운드 전환 시 즉시 정지.
+ * 사운드 — 효과음(Web Audio 합성) + 배경음악(bgm.mp3 루프).
+ * 출시 체크리스트 1번: On/Off 설정 제공, 백그라운드 전환 시 즉시 정지·복귀 시 재개.
+ * BGM도 같은 AudioContext를 타므로 suspend/resume 한 곳에서 전부 처리된다.
  */
 
+import bgmUrl from '../assets/bgm.mp3';
 import { kvGet, kvSet } from './kv';
 
 const KEY = 'summer-waruru:sound';
@@ -18,7 +20,11 @@ export function setSoundOn(on: boolean) {
   enabled = on;
   kvSet(KEY, on ? '1' : '0');
   if (!on) ctx?.suspend().catch(() => {});
-  else ctx?.resume().catch(() => {});
+  else {
+    ctx?.resume().catch(() => {});
+    // 꺼진 상태로 있다가 켜면 BGM이 아직 시작 전일 수 있다 — 토글 클릭도 사용자 제스처라 시작 가능
+    startBgm();
+  }
 }
 
 /** 사용자 제스처 시점에 호출 — iOS 오디오 잠금 해제 */
@@ -39,6 +45,44 @@ function ensureCtx(): AudioContext {
     });
   }
   return ctx;
+}
+
+// ─── 배경음악 ───────────────────────────────────────────
+// 60초 크로스페이드 루프(bgm.mp3)를 AudioBufferSourceNode.loop로 재생 — 이음매 없는 반복.
+// 백그라운드 정지/복귀 재개·On/Off는 ctx.suspend/resume이 효과음과 함께 일괄 처리.
+
+const BGM_VOLUME = 0.35; // 효과음(peak 0.08~0.22)을 가리지 않는 수준
+
+let bgmStarted = false;
+let bgmLoading = false;
+
+/**
+ * BGM 시작 — 사용자 제스처 시점에 호출(모바일 자동재생 정책).
+ * 여러 번 불러도 안전(이미 재생 중/로딩 중이면 무시). 실패는 조용히 무시(게임 진행 무영향).
+ */
+export function startBgm() {
+  if (!enabled || bgmStarted || bgmLoading) return;
+  const c = ensureCtx();
+  if (c.state === 'suspended') c.resume().catch(() => {});
+  bgmLoading = true;
+  fetch(bgmUrl)
+    .then((r) => r.arrayBuffer())
+    .then((buf) => c.decodeAudioData(buf))
+    .then((buffer) => {
+      if (bgmStarted) return;
+      const src = c.createBufferSource();
+      src.buffer = buffer;
+      src.loop = true;
+      const gain = c.createGain();
+      gain.gain.value = BGM_VOLUME;
+      src.connect(gain).connect(c.destination);
+      src.start();
+      bgmStarted = true;
+    })
+    .catch(() => {})
+    .finally(() => {
+      bgmLoading = false;
+    });
 }
 
 function tone(

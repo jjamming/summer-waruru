@@ -3,6 +3,7 @@ import GameScreen from './screens/GameScreen';
 import LandingScreen from './screens/LandingScreen';
 import { consumeHeart } from './lib/hearts';
 import { kvSet } from './lib/kv';
+import { startBgm, unlockAudio } from './lib/sound';
 
 export default function App() {
   const [screen, setScreen] = useState<'landing' | 'game'>('landing');
@@ -13,6 +14,16 @@ export default function App() {
 
   const screenRef = useRef(screen);
   screenRef.current = screen;
+
+  useEffect(() => {
+    // BGM은 자동재생 정책상 사용자 제스처가 필요 — 첫 터치(랜딩 CTA·사운드 토글 등 무엇이든)에서 시작
+    const onFirstPointer = () => {
+      unlockAudio();
+      startBgm();
+    };
+    document.addEventListener('pointerdown', onFirstPointer, { once: true });
+    return () => document.removeEventListener('pointerdown', onFirstPointer);
+  }, []);
 
   useEffect(() => {
     // 토스 앱 안: OS 스와이프 뒤로가기 제스처 차단 (출시 가이드)
