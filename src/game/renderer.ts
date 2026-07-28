@@ -213,6 +213,42 @@ function drawBackground(ctx: CanvasRenderingContext2D, vp: Viewport) {
   }
 }
 
+// ── 배경 오프스크린 캐시 ─────────────────────────────────────────────
+// 배경은 뷰포트·이미지 로드 상태가 그대로면 매 프레임 동일하다. 한 번만 그려
+// 오프스크린 캔버스에 캐시하고, 매 프레임은 단일 drawImage 로 blit 한다
+// (매 프레임 대형 배경 webp 재스케일 제거 — 저사양 기기 끊김 대비).
+let bgCanvas: HTMLCanvasElement | null = null;
+let bgCtx: CanvasRenderingContext2D | null = null;
+let bgSig = '';
+
+function blitBackground(ctx: CanvasRenderingContext2D, vp: Viewport) {
+  const cw = ctx.canvas.width;
+  const ch = ctx.canvas.height;
+  // 재빌드 트리거: 뷰포트 기하 변화(리사이즈) + 배경 이미지 로드 완료(폴백→이미지)
+  const portraitReady = getSceneImage('background') ? 1 : 0;
+  const wideReady = getSceneImage('background-wide') ? 1 : 0;
+  const sig = `${cw}x${ch}|${vp.w}x${vp.h}|${vp.top},${vp.left}|${portraitReady}${wideReady}`;
+
+  if (sig !== bgSig) {
+    if (!bgCanvas) {
+      bgCanvas = document.createElement('canvas');
+      bgCtx = bgCanvas.getContext('2d');
+    }
+    if (!bgCtx || !bgCanvas) {
+      // 오프스크린 컨텍스트 실패 — 캐시 없이 직접 그리기 폴백
+      drawBackground(ctx, vp);
+      return;
+    }
+    // 메인 캔버스와 동일한 디바이스 픽셀 해상도 → blit 시 1:1, DPR 선명도 유지
+    bgCanvas.width = cw;
+    bgCanvas.height = ch;
+    bgCtx.setTransform(cw / vp.w, 0, 0, ch / vp.h, 0, 0);
+    drawBackground(bgCtx, vp);
+    bgSig = sig;
+  }
+  ctx.drawImage(bgCanvas!, 0, 0, vp.w, vp.h);
+}
+
 function drawPlatforms(ctx: CanvasRenderingContext2D, engine: GameEngine) {
   for (const r of engine.platformRects) {
     // 나무 판자
@@ -301,8 +337,8 @@ function drawScoreFloaters(ctx: CanvasRenderingContext2D, engine: GameEngine) {
 }
 
 export function render(ctx: CanvasRenderingContext2D, engine: GameEngine, vp: Viewport) {
-  ctx.clearRect(0, 0, vp.w, vp.h);
-  drawBackground(ctx, vp);
+  // 배경은 캐시 blit (전체를 불투명하게 덮으므로 clearRect 불필요)
+  blitBackground(ctx, vp);
   // 게임 월드는 중앙(vp.left, vp.top)에 고정 — 기기 비율과 무관하게 동일한 플레이 영역
   ctx.save();
   ctx.translate(vp.left, vp.top);
