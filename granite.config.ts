@@ -3,7 +3,8 @@ import { defineConfig } from '@apps-in-toss/web-framework/config';
 export default defineConfig({
   appName: 'summer-waruru',
   brand: {
-    displayName: '여름와르르',
+    // 콘솔 "앱 정보등록" 이름과 동일해야 함 (심사 요건) — 띄어쓰기 포함 일치
+    displayName: '여름 와르르',
     primaryColor: '#4AB3E8',
     // 앱 아이콘 — GitHub Pages(개인정보처리방침 레포)에 호스팅. 원본은 src/assets/app-icon/
     icon: 'https://jjamming.github.io/summer-waruru-privacy/icon-512.png',
