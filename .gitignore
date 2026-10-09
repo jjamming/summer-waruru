@@ -9,3 +9,6 @@ dist
 # Android Studio IDE / 릴리스 빌드 산출물
 android/.idea/
 android/app/release/
+
+# 기획·설계·세션 노트 — 별도 private 레포로 분리 (jjamming/summer-waruru-docs)
+docs/
